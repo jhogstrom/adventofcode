@@ -1,11 +1,12 @@
 rawinp = open('10.txt').read()
 data = list(range(256))
 
-#rawinp = "3,4,1,5"
-#data = [0, 1, 2, 3, 4]
-#rawinp="1,2,3"
-#rawinp = ""
-#rawinp = "AoC 2017"
+rawinp = "3,4,1,5"
+#   data = [0, 1, 2, 3, 4]
+rawinp="1,2,3"; answer = "3efbe78a8d82f29979031a4aa0b16a9d"
+rawinp="1,2,4"; answer = "63960835bcdc130f0b66d7ff4f6a5a8e"
+#rawinp = ""; answer =    "a2582a3a0e66e6e86e3812dcb672a272"
+#rawinp = "AoC 2017"; answer = "33efeb34ea91902bb2f59c9920caa6cd"
 inp = [ord(c) for c in rawinp] + [17, 31, 73, 47, 23]
 
 #print(inp)
@@ -37,7 +38,12 @@ for i in range(16):
     for c in d:
         r ^= c
 
-    res += hex(r).split('x')[-1]
-print(inp)
-print(data)
-print(res)
+    c = hex(r).split('x')[-1]
+    if (len(c) == 1): c = "0" + c
+    res += c
+    print(c, r)
+#print(inp)
+#print(data)
+
+print("res:", len(res), res)
+print("ans:", len(answer), answer)
