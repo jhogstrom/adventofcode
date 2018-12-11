@@ -64,8 +64,8 @@ def readcoords():
 
 def fillgrid():
 	print("filling")
-	for y in range(miny, maxy-miny):
-		for x in range(minx, maxx):
+	for y in range(miny-10, miny + maxy-miny+10):
+		for x in range(minx-10, miny + maxx+10):
 			if [x, y] in coords:
 				c = coords.index([x, y])
 			else:
@@ -163,7 +163,7 @@ def calctotaldist():
 
 	print("Largest area: ", largestarea)
 	print("Largest area in total: ", area)
-	print("Should be larger than 41542")
+	print("Should be larger than 41542,  42221")
 
 readcoords()
 fillgrid()
