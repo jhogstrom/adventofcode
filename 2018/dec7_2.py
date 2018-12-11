@@ -1,6 +1,8 @@
 from collections import defaultdict
 all=[ s.strip() for s in open('7','r').readlines()]
 
+BASECOST=60
+
 testdata = [
 "Step C must be finished before step A can begin.",
 "Step C must be finished before step F can begin.",
@@ -18,12 +20,21 @@ class Node:
 		self.nextnodes = []
 		self.graph = graph
 		self.dependson = []
+		self.cost = BASECOST + "ABCDEFGHIJKLMNOPQRSTUVWXYZ".index(name) + 1
+		self.inprogress = False
+	def startwork(self):
+		self.inprogress = True
+	def tick(self):
+		self.cost -= 1
+		if self.cost == 0:
+			self.markdone()
 	def addnext(self, nextname):
 		n = self.graph.findnode(nextname)
 		n.dependson.append(self)
 		self.nextnodes.append(n)
 	def markdone(self):
-		print("Did", self.name)
+		#print("Did", self.name)
+		self.inprogress = False
 		self.done = True
 	def depsdone(self):
 		res = True
@@ -31,33 +42,19 @@ class Node:
 			res &= n.done
 		return res
 	def __eq__(self, other):
+		if other == None: return False
 		return self.name.lower() == other.name.lower()
 	def __lt__(self, other):
 		return self.name.lower() < other.name.lower()		
 	def __hash__(self):
 		return hash(self.name)
-	def startexecute(self):
-		r = ""#self.name
-#		self.markdone()
-		available = self.graph.getfirst()
-		while available != []:
-			n = available[0]
-			if not n.name in r:
-				r += n.name
-			eligble = []
-			n.markdone()
-			for e in n.nextnodes:
-				print("Checking", e.name, [_.name for _ in e.dependson])
-				if e.depsdone():
-					eligble.append(e)
-			available = sorted(available[1:] + eligble)
-			print([_.name for _ in available])
-		return r
 
 class Graph:
-	def __init__(self):
+	def __init__(self, w):
 		self.nodes = []
-
+		self.workers = [None for _ in range(w)]
+		self.totaltime = 0
+		self.completednodes = ""
 	def findnode(self, name):
 		for n in self.nodes:
 			if n.name == name:
@@ -71,15 +68,111 @@ class Graph:
 		for n in self.nodes:
 			if n.dependson == []:
 				res.append(n)
-		return res
+		return sorted(res)
 	def reset(self):
 		for n in self.nodes:
 			n.done = False
+	def alldone(self):
+		for n in self.nodes:
+			if not n.done:
+				return False
+		return True
 
+	def freeworker(self, node):
+		if node in self.workers:
+			return False
+		for w in self.workers:
+			if w == None:
+				return True
+		return False
+
+	def assignwork(self, node):
+		for i in range(len(self.workers)):
+			if self.workers[i] == None:
+				self.workers[i] = node
+				node.startwork()
+				return
+
+	def tick(self):
+		self.totaltime += 1
+		for w in self.workers:
+			if w != None:
+				w.tick()
+
+	def getcompleted(self):
+		res = []
+		for i in range(len(self.workers)):
+			if self.workers[i] != None and self.workers[i].done:
+				res.append(self.workers[i])
+				self.workers[i] = None
+		return res
+
+	def completednodes_(self):
+		res = []
+		for n in self.nodes:
+			if n.done:
+				res.append(n.name)
+		return "".join(sorted(res))
+
+	def nodesinprogress(self):
+		res = []
+		for n in self.nodes:
+			if n.inprogress:
+				res.append(n.name)
+		return "".join(sorted(res))		
+
+	def printstatus(self):
+		r = "{0:3} ".format(self.totaltime)
+		for w in self.workers:
+			if None == w:
+				r += ". "
+			else:
+				r += w.name + " "
+		r += " {0:{1}} ".format(self.completednodes, len(self.nodes))
+		r += " [{0}]".format(self.nodesinprogress())
+		print(r)
+
+	def execute(self):
+		available = self.getfirst()
+		while not self.alldone():
+			inprogress = []
+			for n in available:
+				if self.freeworker(n):
+					self.assignwork(n)
+					inprogress.append(n)
+
+			for n in inprogress:
+				available.remove(n)
+
+			self.printstatus()
+
+			self.tick()
+			completed = self.getcompleted()
+
+			newnodes = []
+			for n in completed:
+				self.completednodes += n.name
+				newnodes += n.nextnodes
+				#print("Completed", n.name, "possibly eligeble", [_.name for _ in n.nextnodes])
+				#print("Total eligeble: ", [_.name for _ in newnodes])
+
+			eligble = []
+
+			for e in newnodes:
+				#print("Checking", e.name, [_.name for _ in e.dependson])
+				if e.depsdone():
+					eligble.append(e)
+					#print("+Found", e.name, "to do")
+				else:
+					#print("-", e.name, "is not ready")
+					pass
+			available = sorted(available + eligble)
+			#print([_.name for _ in available])
+		return self.completednodes
 
 #all = testdata
 
-graph = Graph()
+graph = Graph(5)
 
 def readtree():
 	for s in all:
@@ -89,110 +182,5 @@ def readtree():
 
 
 readtree()
-first = sorted(graph.getfirst())
-#print(first.name)
-print(first[0].startexecute())
-
-#for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-#	print(c, graph.findnode(c).startexecute())
-#	graph.reset()
-exit()
-def getdeps(target):
-	res = []
-	for p in tree:
-		if target in tree[p]:
-			res.append(p)
-	return sorted(res)
-
-def getalltargets():
-	return sorted(dobefore.keys())
-
-def firsttarget():
-	for c in doafter.keys():
-		if not c in dobefore.keys():
-			return c
-def getpossible(donelist):
-	print("Done", donelist)
-	res = set()
-	for d in donelist:
-		for n in doafter[d]:
-			if n in donelist:
-				res.add(n)
-	return sorted(list(res))
-
-
-readtree()
-t = getalltargets()
-print(t)
-print(sorted(doafter.keys()))
-
-
-first = firsttarget()
-done = []
-done.append(first)
-done += sorted(doafter[first])
-
-donext = getpossible(done)
-
-print("next:", donext)
-
-print(first)
-print(done)
-exit()
-
-def getnext(t):
-	if not t in tree:
-		return []
-	return sorted(tree[t])
-
-available = getnext(first)
-#print(first, available)
-
-#for n in next:
-#	print(n, "=> ", getnext(n))
-
-#for n in prereqtree:#
-#	print(n, "=>", prereqtree[n]) 
-
-#print(getnext("L"))
-done = [first]
-print("start with", first)
-print(first, tree[first], available)
-print(getnext(available[0]))
-exit()
-while available != []:
-	
-	n = available[0]
-	done += n
-	available = set()
-	for d in done:
-		for a in tree[d]:
-			if a in done and a != d:
-				available.add(a)
-	available = sorted(list(available))
-	print(done, available)
-
-#	exit()
-#
-#
-#	available = available[1:]
-#	nextup = getnext(n)
-#	print("Next downstream for {0}: {1}".format(n, nextup))
-#	for t in nextup:
-#		isdone = True
-#		for p in prereqtree[t]:
-#			if not p in done:
-#				isdone = False
-#		if isdone:
-#			available.append(t)
-#			print("All prereqs of {0} ({1}) are done. Adding it".format(t, prereqtree[t]))
-#	available += getnext(n)
-#	available = sorted(available)
-#	print("done:", done, "available", available)
-
-r = ""
-for i in done:
-	r += i
-print("RESULT", r)
-
-#nopt BLMPUWX
+print(graph.execute())
+print(graph.totaltime)
