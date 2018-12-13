@@ -107,12 +107,10 @@ def readdata(filename):
 		for c in all[r]:
 			if c in "<>^v":
 				cars.append(Car(len(grid[r]), len(grid)-1, c, grid, cars))
-			#print(c)
 			if c in "<>": c = "-"
 			if c in "v^": c = "|"
 			if c in "\\/-|+ ":
 				grid[r].append(c)
-		#print(len(all[r]), all[r][:60])
 	return grid, sorted(cars)
 
 def printcars(cars):
@@ -140,7 +138,7 @@ def printgrid(grid, cars):
 
 def tick():
 	for c in sorted(cars):
-		if c in cars:
+		if not c.eliminated:
 			c.move()
 		remains = []
 		for k in cars:
