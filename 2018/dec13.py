@@ -1,24 +1,10 @@
 from collections import defaultdict
 
-NS = "|"
-EW = "-"
-LT = "\\"
-RT = "/"
-INTSCT = "+"
-
-mapchar = dict()
-mapchar[NS] = 0
-mapchar["v"] = 0
-mapchar["^"] = 0
-mapchar[EW] = 1
-mapchar["<"] = 1
-mapchar[">"] = 1
-mapchar[LT] = 2
-mapchar[RT] = 3
-mapchar[INTSCT] = 4
-mapchar[" "] = 5
 directions = "<^>v"
 turns=[3, 0, 1]
+xmove = [-1, 0, 1, 0]
+ymove = [0, -1, 0, 1]
+doturn = {"/": [3, 1, 3, 1], "\\": [1, 3, 1, 3]}
 
 class Car:
 	def __init__(self, x, y, c, grid, cars):
@@ -35,40 +21,17 @@ class Car:
 		self.direction += turns[turn]
 		self.direction %= 4
 		self.lastturn = turn
-	def turnleft(self):
-		self.direction += 3
-		self.direction %= 4
-	def turnright(self):
-		self.direction += 1
-		self.direction %= 4
 	def move(self):
 		if self.eliminated:
 			return
-		if self.direction == directions.index("<"): self.x -= 1
-		elif self.direction == directions.index(">"): self.x += 1
-		elif self.direction == directions.index("^"): self.y -= 1
-		elif self.direction == directions.index("v"): self.y += 1
-		else: raise
+		self.x += xmove[self.direction]
+		self.y += ymove[self.direction]
 
-		if self.grid[self.y][self.x] == "/":
-			if self.direction == directions.index(">"): 
-				self.turnleft()
-			elif self.direction == directions.index("<"): 
-				self.turnleft()
-			elif self.direction == directions.index("^"): 
-				self.turnright()
-			elif self.direction == directions.index("v"):
-				self.turnright()
-		elif self.grid[self.y][self.x] == "\\":
-			if self.direction == directions.index(">"):
-				self.turnright()
-			elif self.direction == directions.index("<"): 
-				self.turnright()
-			elif self.direction == directions.index("^"): 
-				self.turnleft()
-			elif self.direction == directions.index("v"): 
-				self.turnleft()
-		elif self.grid[self.y][self.x] == "+":
+		c = self.grid[self.y][self.x]
+		if c in "\\/":
+			self.direction += doturn[c][self.direction]
+			self.direction %= 4
+		elif c == "+":
 			self.maketurn()
 
 #		self.detectcollission()
@@ -120,11 +83,9 @@ def printgrid(grid, cars):
 	for y in range(len(grid)):
 		r = ""
 		for x in range(len(grid[y])):
-			hascar = False
 			curcar = []
 			for c in cars:
 				if c.atpos(x, y):
-					hascar = True
 					curcar.append(c)
 					
 			if curcar == []:
