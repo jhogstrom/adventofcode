@@ -253,7 +253,7 @@ def runprog(prg, noun, verb):
 
 
 def dec2_star1():
-    filename = f'{curdir}\\2.txt'
+    filename = f'{curdir}\\dec2.txt'
     prgdata = open(filename, 'r').readline()
 
     prg = [int(_) for _ in prgdata.split(",")]
@@ -261,7 +261,7 @@ def dec2_star1():
 
 
 def dec2_star2():
-    filename = f'{curdir}\\2.txt'
+    filename = f'{curdir}\\dec2.txt'
     prgdata = open(filename, 'r').readline()
 
     maxi1, maxi2, target = 100, 100, 19690720
@@ -273,13 +273,13 @@ def dec2_star2():
                 return
 
 def dec5_star1():
-    filename = f'{curdir}\\5.txt'
+    filename = f'{curdir}\\dec5.txt'
     prgdata = open(filename, 'r').readline()
     prg = [int(_) for _ in prgdata.split(",")]
     intcomputer(prg, input = [1]).execute()
 
 def dec5_star2():
-    filename = f'{curdir}\\5.txt'
+    filename = f'{curdir}\\dec5.txt'
     prgdata = open(filename, 'r').readline()
     prg = [int(_) for _ in prgdata.split(",")]
     c = intcomputer(prg, input = [5]).execute()

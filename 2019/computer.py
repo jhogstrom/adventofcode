@@ -1,11 +1,11 @@
 class intcomputer:
-    def __init__(self, prog, param_array = [], name = None):
+    def __init__(self, prog, param_array = [], name = None, debug=True):
         self.prog = prog
         self.pptr = 0
         self._terminated = False
         self._waiting = False
         self.input = param_array
-        self.debug = False
+        self.debug  = debug
         self.result = 0
         if name:
             self.name = name
@@ -13,7 +13,8 @@ class intcomputer:
             self.name = "NONAME"
         self.relativebase = 0
         self.outputarray = []
-        print(f"Creating {self.name}({param_array})")
+        if self.debug:
+            print(f"Creating {self.name}({param_array})")
 
     def __str__(self):
         res = []
@@ -69,11 +70,12 @@ class intcomputer:
 
         res = ""
 
-        if self._terminated:
-            res += f" >> TERMINATED -- @ {self.pptr}<<"
-        if self._waiting:
-            res += f" >> WAITING -- @ {self.pptr}<<"
-        #print(res)
+        if self.debug:
+            if self._terminated:
+                res += f" >> TERMINATED -- @ {self.pptr}<<"
+            if self._waiting:
+                res += f" >> WAITING -- @ {self.pptr}<<"
+            print(res)
         return self
         
     def step(self):

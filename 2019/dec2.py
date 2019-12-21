@@ -1,7 +1,7 @@
 import os
 
 curdir = os.path.dirname(os.path.abspath(__file__))
-filename = f'{curdir}\\2.txt'
+filename = f'{curdir}\\dec2.txt'
 
 prgdata = open(filename, 'r').readline()
 #prgdata = "1,0,0,0,99"

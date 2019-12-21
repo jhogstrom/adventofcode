@@ -22,7 +22,10 @@ class Cell:
         return self.x == value.x and self.y == value.y
 
     def __hash__(self):
-        return (abs(self.x) << 5) + self.y + self.x * 17
+        return hash((self.x, self.y))
 
     def manhattandist(self, c):
         return abs(self.x - c.x) + abs(self.y - c.y)
+
+    def add(self, x, y):
+        return Cell(self.x + x, self.y + y)

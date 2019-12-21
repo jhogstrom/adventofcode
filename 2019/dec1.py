@@ -1,7 +1,7 @@
 import os
 
 curdir = os.path.dirname(os.path.abspath(__file__))
-filename = f'{curdir}\\1.txt'
+filename = f'{curdir}\\dec1.txt'
 fuel = sum([int(_)//3 - 2 for _ in open(filename, 'r').readlines()])
 
 print(f"First challenge: {fuel}")
