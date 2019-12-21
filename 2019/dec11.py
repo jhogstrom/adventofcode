@@ -72,8 +72,7 @@ def dec11_star1():
     prgdata = open(filename, 'r').readline()
 
     prg = [int(_) for _ in prgdata.split(",")]    
-    p = copy.copy(prg)
-    computer = intcomputer(p, name=f"PainterRobot{cnt}")
+    computer = intcomputer(prg, name=f"PainterRobot{cnt}")
     
     cnt += 1
     robot = Robot(computer)
