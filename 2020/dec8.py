@@ -1,10 +1,14 @@
 import os
 import itertools
 from timing import timeit
+import logging
 
-curdir = os.path.dirname(os.path.abspath(__file__))
-filename = f'{curdir}\\dec8.txt'
+filename = os.path.abspath(__file__).replace(".py", ".txt")
+if not os.path.exists(filename):
+    raise Exception(f"'{filename} does not exist")
 data = [_.strip() for _ in open(filename, 'r').readlines()]
+
+logging.basicConfig(level=logging.DEBUG)
 
 # data = [
 #     "nop +0",
@@ -34,13 +38,11 @@ class IntComputer():
             print(s)
 
     def executeline(self, line):
-        self.log(f"{self.p:3} {line} - {self.acc}")
+        # self.log(f"{self.p:3} {line} - {self.acc}")
+
         # Been here before?
         if self.p in self.executedlines:
-            self.log(self.acc)
             return False
-
-        # Remember where we've been
         self.executedlines.append(self.p)
 
         # execute instruction
@@ -68,38 +70,34 @@ class IntComputer():
         self.log("done")
 
     def runmod(self):
-        modified_jmp = []
-        org_code = [_ for _ in self.code]
-        count = 0
         completed = False
-        while not completed:
-            # restore code
-            self.code = [_ for _ in org_code]
+        for i, line in enumerate(self.code):
             self.reset()
-            # replace one line
-            for i, line in enumerate(self.code):
-                if "jmp" in line and i not in modified_jmp:
-                    self.code[i] = line.replace("jmp", "nop")
-                    self.log(f"{i}: replaced {self.code[i]}")
-                    modified_jmp.append(i)
-                    break
-            # run modified code
-            completed = self.run()
+            if "jmp" in line:
+                self.code[i] = line.replace("jmp", "nop")
+                if self.run():
+                    return
+                self.code[i] = line
+            elif "nop" in line:
+                self.code[i] = line.replace("nop", "jmp")
+                if self.run():
+                    return
+                self.code[i] = line
+        raise Exception("That didn't go well...")
 
-            # Safety switch...
-            count += 1
-            if count > len(org_code):
-                print("PROBLEM")
-                return
-        self.log(self.acc)
 
 
 debug = False
+
+
+@timeit
 def star1():
     c = IntComputer(data, debug=debug)
     c.run()
     print(f"* {c.acc}")
 
+
+@timeit
 def star2():
     c = IntComputer(data, debug=debug)
     c.runmod()
