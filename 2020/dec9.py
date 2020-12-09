@@ -1,7 +1,6 @@
 import os
 import itertools
 from timing import timeit
-import logging
 
 filename = os.path.abspath(__file__).replace(".py", ".txt")
 if not os.path.exists(filename):
@@ -55,10 +54,8 @@ def star1():
 
 @timeit
 def star2(target):
-    c = 0
     for i in range(len(data)-1):
         for j in range(len(data)):
-            c += 1
             _sum = sum(data[i:j])
             if _sum > target:
                 break
