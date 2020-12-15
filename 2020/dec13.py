@@ -28,7 +28,7 @@ def star1():
     # print(f"min: {m}")
     # print(f"wait: {m-departure}")
     return (m-departure)*deps[m]
-    print(f"* {(m-departure)*deps[m]}")
+
 
 def star2_core(data_arr, start_t=0):
     # Parse input
@@ -98,5 +98,4 @@ def star2():
 
 
 print(f"* {star1()}")
-r = star2()
-print(f"** {r}")
+print(f"** {star2()}")
