@@ -23,7 +23,7 @@ def parse(s):
     allergens = set(allergens[:-1].split(", "))
     return ingredients, allergens
 
-food_with_allergen = defaultdict(set)
+allergen_contained_in = defaultdict(set)
 appearance = defaultdict(int)
 all_allergens = set()
 all_ingredients = set()
@@ -36,19 +36,19 @@ for d in data:
     all_allergens |= allergens
 
 # prime the list
-# for a in all_allergens:
-#     food_with_allergen[a] = all_ingredients.copy()
+for a in all_allergens:
+    allergen_contained_in[a] = all_ingredients.copy()
 
 for d in data:
     ingredients, allergens = parse(d)
     for a in allergens:
-        food_with_allergen[a] |= ingredients
+        allergen_contained_in[a] &= ingredients
 
     for i in ingredients:
         appearance[i] += 1
 
 contains_allergens = set()
-for f in food_with_allergen.values():
+for f in allergen_contained_in.values():
     contains_allergens |= f
 
 no_allergens = all_ingredients - contains_allergens
@@ -58,21 +58,18 @@ for n in no_allergens:
     res += appearance[n]
 
 print(f"* {res}")
+# exit()
 
 canonical_list = {}
-while food_with_allergen:
-    unique = {k:v for k, v in food_with_allergen.items() if len(v) == 1}
-    # printdict("unique", unique)
-    for k, v in unique.items():
+while allergen_contained_in:
+    appears_once = {k:v for k, v in allergen_contained_in.items() if len(v) == 1}
+
+    for k, v in appears_once.items():
         canonical_list[k] = list(v)[0]
-        for m in food_with_allergen:
-            food_with_allergen[m] = food_with_allergen[m] - v
+        for m in allergen_contained_in:
+            allergen_contained_in[m] = allergen_contained_in[m] - v
 
-    food_with_allergen = {k:v for k,v in food_with_allergen.items() if v}
-
-# printdict("canonical_list", canonical_list)
+    allergen_contained_in = {k:v for k,v in allergen_contained_in.items() if v}
 
 r = ",".join([canonical_list[k] for k in sorted(canonical_list)])
 print(f"** {r}")
-
-
