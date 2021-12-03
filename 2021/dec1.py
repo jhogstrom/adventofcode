@@ -1,5 +1,6 @@
 import os
 from timer import timeit
+
 curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\dec1.txt'
 data = [int(_) for _ in open(filename, 'r').readlines()]
@@ -43,9 +44,10 @@ def star2():
         if d1 < d2:
             increase_count += 1
         # print(f"{d1} {d2}, {d1 < d2}")
+    return increase_count
 
     print(increase_count)
 
 
 star1()
-star2()
+print(star2())
