@@ -38,43 +38,29 @@ def star1():
 
 
 def onecount(numbers, p) -> int:
-    res = 0
-    for d in numbers:
-        if d[p] == "1":
-            res += 1
-    return res
+    return sum(1 for _ in numbers if _[p] == "1")
 
 
 def filterdata(numbers, p, bit):
-    res = [_ for _ in numbers if _[p] == bit]
-    return res
+    return [_ for _ in numbers if _[p] == bit]
 
 
-bitmap ={ True: "1", False: "0"}
+bitmap = { True: "1", False: "0"}
 
 @timeit
 def star2(data):
-    org = [*data]
+    scrubdata = [*data]
     wordlen = len(data[0])
-    bitcount = [0] * wordlen
-    # print(bitcount)
 
     for i in range(wordlen):
-        c = onecount(data, i)
-        data = filterdata(data, i, bitmap[c >= len(data)/2])
-        if len(data) == 1:
-            break
+        if len(data) > 1:
+            data = filterdata(data, i, bitmap[onecount(data, i) >= len(data)/2])
 
-    # print(data)
+        if len(scrubdata) > 1:
+            scrubdata = filterdata(scrubdata, i, bitmap[onecount(scrubdata, i) < len(scrubdata)/2])
+
     generator = int(data[0], 2)
-
-    data = [*org]
-    for i in range(wordlen):
-        c = onecount(data, i)
-        data = filterdata(data, i, bitmap[c < len(data)/2])
-        if len(data) == 1:
-            break
-    scrub = int(data[0], 2)
+    scrub = int(scrubdata[0], 2)
 
     print(generator, scrub, generator * scrub)
 
