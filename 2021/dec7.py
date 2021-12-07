@@ -12,19 +12,12 @@ data = [int(_) for _ in data[0].split(",")]
 
 
 def calc_cost(p, data, calculator):
-    res = 0
-    for _ in data:
-        res += calculator(abs(_-p))
-    return res
+    return sum(calculator(abs(_-p)) for _ in data)
 
 
 @timeit
 def calculate(data, calculator):
-    cost = {}
-    for p in range(min(data), max(data)+1):
-        cost[p] = calc_cost(p, data, calculator)
-
-    print(int(min(cost.values())))
+    print(int(min( [calc_cost(p, data, calculator) for p in range(min(data), max(data)+1)])))
 
 
 calculate(data, lambda x: x)
