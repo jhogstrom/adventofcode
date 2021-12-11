@@ -2,7 +2,7 @@ import os
 from timer import timeit
 from collections import defaultdict, deque
 
-stardate = 10
+stardate =
 dataname = f"dec{stardate}.txt"
 dataname = f"dec{stardate}_test.txt"
 curdir = os.path.dirname(os.path.abspath(__file__))
