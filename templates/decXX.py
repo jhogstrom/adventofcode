@@ -18,5 +18,6 @@ def star1(data):
 def star2(data):
     ...
 
+data2 = data[:]
 star1(data)
-star2(data)
+star2(data2)
