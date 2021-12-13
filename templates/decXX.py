@@ -8,6 +8,9 @@ dataname = f"dec{stardate}_test.txt"
 curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = [_.strip() for _ in open(filename, 'r').readlines()]
+if not data:
+    raise FileNotFoundError(f"No data in {dataname}")
+
 
 @timeit
 def star1(data):
