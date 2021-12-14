@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 stardate = 13
 dataname = f"dec{stardate}.txt"
 # dataname = f"dec{stardate}_test.txt"
+dataname = f"dec{stardate}_extra.txt"
 curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = [_.strip() for _ in open(filename, 'r').readlines()]
@@ -80,5 +81,5 @@ def star2(data):
     print_data(dots)
 
 data2 = data[:]
-star1(data)
+# star1(data)exit()
 star2(data2)
