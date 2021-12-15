@@ -31,15 +31,15 @@ class Node():
     def cost(self):
         if self._cost > -1:
             return self._cost
-        if not self.parent:
-            self._cost = self.value
-            return self.value
+        if not self.parent:  # Start node doesn't count
+            self._cost = 0
+            return 0
         res = self.value + self.parent.cost
         self._cost = res
         return res
 
     def __str__(self) -> str:
-        return f"{self.pos} - {self.value}"
+        return f"{self.pos} - {self.value} ({self.cost})"
 
 
 def get_neighbors(maze, current):
@@ -58,7 +58,7 @@ def get_neighbors(maze, current):
     return res
 
 
-def findpath(maze, start, end):
+def dijkstra(maze, start, end):
     # Create start and end node
     start_node = Node(None, start, maze[start[1]][start[0]])
     start_node.g = start_node.value
@@ -70,17 +70,20 @@ def findpath(maze, start, end):
 
     # Add the start node
     candidates.append(start_node)
+    c = 0
 
     # Loop until you find the end
     while len(candidates) > 0:
+        c += 1
 
-        best_node = candidates[0]
-        for _ in candidates:
-            if _.cost < best_node.cost:
-                best_node = _
+        current = candidates[0]
+        for _ in candidates[1:]:
+            if _.cost < current.cost:
+                current = _
 
-        current = best_node
-        candidates.remove(best_node)
+        if c % 1000 == 0:
+            print(f"Count: {c:<7} {current} Visited: {len(visited)} Candidates: {len(candidates)}")
+        candidates.remove(current)
         visited.append(current)
         # print(f"Looking at {current}")
         if current == end_node:
@@ -91,10 +94,11 @@ def findpath(maze, start, end):
             return path[::-1] # Return reversed path
 
         for child in [_ for _ in get_neighbors(maze, current) if _ not in visited]:
-            if child in visited:
-                vnode = [_ for _ in visited if _ == child]
-                if vnode.cost > child.cost:
-                    vnode.set_parent(current)
+            # if child in visited:
+            #     vnode = [_ for _ in visited if _ == child]
+            #     if vnode.cost > child.cost:
+            #         print(f"Replacing {vnode} with {child}")
+            #         vnode.set_parent(current)
             if child not in candidates:
                 candidates.append(child)
 
@@ -104,20 +108,38 @@ def star1(data):
     maze = []
     for s in data:
         maze.append([int(_) for _ in s])
-    # print(maze)
 
-    path = findpath(maze, (0, 0), (len(maze[0])-1, len(maze)-1))
+
+    path = dijkstra(maze, (0, 0), (len(maze[0])-1, len(maze)-1))
 
     # for _ in path:
     #     print(_)
-    # print([str(_) for _ in path])
-    print(sum(_.value for _ in path[1:]))
+
+    print(path[-1].cost)
 
 
 @timeit
 def star2(data):
-    ...
+    maze = []
+    for i in range(5):
+        for s in data:
+            row = []
+            for j in range(5):
+                row.extend([int(_)+j+i for _ in s])
+            for f in range(len(row)):
+                row[f] = row[f] % 9 or 9
+            maze.append(row)
 
-data2 = data[:]
-star1(data)
-star2(data2)
+    for _ in maze:
+        print(_)
+    # exit()
+    path = dijkstra(maze, (0, 0), (len(maze[0])-1, len(maze)-1))
+
+    for _ in path:
+        print(_)
+
+    print(path[-1].cost)
+
+# data2 = data[:]
+# star1(data)
+star2(data)
