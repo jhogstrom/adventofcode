@@ -4,7 +4,7 @@ from collections import defaultdict, deque
 
 stardate = 17
 dataname = f"dec{stardate}.txt"
-dataname = f"dec{stardate}_test.txt"
+# dataname = f"dec{stardate}_test.txt"
 curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = [_.strip() for _ in open(filename, 'r').readlines()]
@@ -20,6 +20,7 @@ def deltax(x_vel):
 
 @timeit
 def star1(targetarea: str):
+    x, y = 0, 1
     _, coords = targetarea.split(":")
     target = coords.strip().split(", ")
     target[0] = target[0].split("..")
@@ -30,31 +31,31 @@ def star1(targetarea: str):
         for j in range(2):
             target[i][j] = int(target[i][j])
 
-    p = [0, 0]
-    velocity = [76, 76]
-    x, y = 0, 1
+    targets = [
+        set(range(min(target[x]), max(target[x])+1)),
+        set(range(min(target[y]), max(target[y])+1))]
+
     best_y = 0
     found = 0
-    for xvel in range(0, 152):
-        for yvel in range(-160, 400):
+    # Somewhat arbitrary ranges in x and y
+    for xvel in range(14, 152):
+        for yvel in range(-156, 156):
+            max_y = 0
             p = [0, 0]
             velocity = [xvel, yvel]
-            c = 0
-            max_y = 0
             while True:
                 p[x] += velocity[x]
                 p[y] += velocity[y]
-                velocity[0] += deltax(velocity[0])
+                velocity[x] += deltax(velocity[x])
                 velocity[y] -= 1
                 max_y = max([max_y, p[y]])
                 # print(f"{p} v={velocity} MAX {max_y} Target: {target}")
-                if target[x][0] <= p[x] <= target[x][1] \
-                    and target[y][0] <= p[y] <= target[y][1]:
-                    print(f"FOUND {max_y} @ {(xvel, yvel)}")
-                    best_y = max([max_y, best_y])
+                if p[x] in targets[x] and p[y] in targets[y]:
+                    # print(f"FOUND {max_y} @ {(xvel, yvel)}")
+                    best_y = max([best_y, max_y])
                     found += 1
                     break
-                c += 1
+                # Not necessarily handling target in all quadrants...
                 if p[x] > max(target[x]) or p[y] < min(target[y]):
                     # print(c, "overshoot")
                     break
