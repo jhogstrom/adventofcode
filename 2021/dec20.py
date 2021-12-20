@@ -1,6 +1,8 @@
 import os
 from timer import timeit
 from collections import defaultdict, deque
+import concurrent.futures
+
 
 stardate = 20
 dataname = f"dec{stardate}.txt"
@@ -24,23 +26,42 @@ def print_image(image):
     print("==")
 
 
-def apply_filter(image: defaultdict, filter):
+def generate_line(y, image, filter, xmin, xmax):
+    bitmap = { True: "1", False: "0"}
+    res = {}
+    for x in range(xmin-1, xmax+2):
+        index = []
+        for yi in range(y-1, y+2):
+            for xi in range(x-1, x+2):
+                index.append(bitmap[image[(xi, yi)]])
+        indexb = "".join(index)
+        index = int(indexb, 2)
+        res[(x, y)] = filter[index] == "#"
+        # print("Adding", filter[index] == "#")
+    # print(res)
+    return res
+
+
+def constant_factory(value):
+    return lambda: value
+
+
+def apply_filter_multithread(image: defaultdict, filter):
     yrange = set(_[1] for _ in image)
     xrange = set(_[0] for _ in image)
+    xmin = min(xrange)
+    xmax = max(xrange)
 
     ix = 511 if image.default_factory() else 0
     res = defaultdict(constant_factory(filter[ix] == "#"))
+    futures = []
 
-    for y in range(min(yrange)-1, max(yrange)+2):
-        for x in range(min(xrange)-1, max(xrange)+2):
-            index = []
-            for yi in range(y-1, y+2):
-                for xi in range(x-1, x+2):
-                    index.append("1" if image[(xi, yi)] else "0")
-            indexb = "".join(index)
-            index = int(indexb, 2)
-            # print(f"({x:>2}, {y:>2}): {index:>3}  -> {'#' if image[(x, y)] else '.'}->{filter[index]} [{indexb}]")
-            res[(x, y)] = filter[index] == "#"
+    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+        for y in range(min(yrange)-1, max(yrange)+2):
+            futures.append(executor.submit(generate_line, y, image, filter, xmin, xmax))
+
+    for line in [f.result() for f in futures]:
+        res |= line
 
     # yrange = set(_[1] for _ in res)
     # xrange = set(_[0] for _ in res)
@@ -48,13 +69,34 @@ def apply_filter(image: defaultdict, filter):
 
     return res
 
+def apply_filter(image: defaultdict, filter):
+    yrange = [_[1] for _ in image]
+    xrange = [_[0] for _ in image]
+    xmin = min(xrange)
+    xmax = max(xrange)
+
+    ix = 511 if image.default_factory() else 0
+    res = defaultdict(constant_factory(filter[ix] == "#"))
+    bitmap = { True: "1", False: "0"}
+    resmap = {"#": True, ".": False}
+
+    for y in range(min(yrange)-1, max(yrange)+2):
+        ypixrange = range(y-1, y+2)
+        for x in range(xmin-1, xmax+2):
+            xpixrange = range(x-1, x+2)
+            index = []
+            for yi in ypixrange:
+                for xi in xpixrange:
+                    index.append(bitmap[image[(xi, yi)]])
+            indexb = "".join(index)
+            index = int(indexb, 2)
+            res[(x, y)] = resmap[filter[index]]
+    # print(f"BB: ({min(xrange)}, {min(yrange)}) -> ({max(xrange)}, {max(yrange)})")
+
+    return res
 
 def count_pixels(image):
     return len([_ for _ in image.values() if _])
-
-
-def constant_factory(value):
-    return lambda: value
 
 
 @timeit
