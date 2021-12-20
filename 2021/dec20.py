@@ -24,7 +24,7 @@ def print_image(image):
     print("==")
 
 
-def apply_filter(image: defaultdict, filter, gen):
+def apply_filter(image: defaultdict, filter):
     yrange = set(_[1] for _ in image)
     xrange = set(_[0] for _ in image)
 
@@ -59,9 +59,9 @@ def constant_factory(value):
 
 @timeit
 def evolve_image(data, gen_count):
-    algo = data[0]
-    assert(len(algo) == 512)
-    image = defaultdict(bool)
+    filter = data[0]
+    assert(len(filter) == 512)
+    image = defaultdict(constant_factory(filter[0] == "."))
 
     for i, s in enumerate(data[2:]):
         for j, c in enumerate(s):
@@ -71,7 +71,7 @@ def evolve_image(data, gen_count):
     # print(count_pixels(image))
 
     for i in range(gen_count):
-        image = apply_filter(image, algo, i)
+        image = apply_filter(image, filter)
         # print_image(image)
         # print(i+1, count_pixels(image))
     # print_image(image)
