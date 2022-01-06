@@ -10,7 +10,7 @@ data = [_.strip() for _ in open(filename, 'r').readlines()]
 
 
 @timeit
-def star1():
+def star1(data):
     wordlen = len(data[0])
     bitcount = [0] * wordlen
 
@@ -19,8 +19,7 @@ def star1():
             if d[i] == "1":
                 bitcount[i] += 1
 
-    gamma  = ""
-    epsilon = ""
+    gamma, epsilon  = "", ""
     for b in bitcount:
         if b > len(data)/2:
             gamma += "1"
@@ -31,7 +30,8 @@ def star1():
 
     gamma = int(gamma, 2)
     epsilon = int(epsilon, 2)
-    print(gamma, epsilon, gamma * epsilon)
+    # print(gamma, epsilon, gamma * epsilon)
+    print(gamma * epsilon)
 
 
 def onecount(numbers, p) -> int:
@@ -59,8 +59,9 @@ def star2(data):
     generator = int(data[0], 2)
     scrub = int(scrubdata[0], 2)
 
-    print(generator, scrub, generator * scrub)
+    # print(generator, scrub, generator * scrub)
+    print(generator * scrub)
 
 
-star1()
+star1(data)
 star2(data)

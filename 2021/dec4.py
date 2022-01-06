@@ -8,6 +8,7 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = [_.strip() for _ in open(filename, 'r').readlines()]
 
+
 class Board():
     def __init__(self, b):
         self.won = False
@@ -59,44 +60,55 @@ class Board():
         # print(res)
         return res * n
 
-
     def __str__(self):
         # return "\n".join([str(_) for _ in self.rows])
         return "\n".join([self.rowstr(_) for _ in range(len(self.rows))])
 
 
-def play(n, boards):
+def play(n, boards, winners):
     for b in boards:
         b.play(n)
         if b.bingo():
-            print("bingo", b.calc(n))
-            # print(str(b))
+            winners.append(b.calc(n))
+            # print("bingo", b.calc(n))
 
-def star1(data):
-    randnums = [int(_) for _ in data[0].split(",")]
-    # randnums = [22, 8, 21, 6, 1]
-    boards = []
-    data = data[2:]
-    b = []
-    for s in data:
-        b.append(s)
-        if len(b) == 6:
-            boards.append(Board(b[:-1]))
-            # print("appending", b[:-1])
-            b = []
-    boards.append(Board(b))
 
+def play_boards(randnums, boards, max_wins: int = 0):
+    winners = []
     for n in randnums:
         # print("drawing", n)
-        play(n, boards)
+        play(n, boards, winners)
+        if max_wins and len(winners) >= max_wins:
+            return winners
+    return winners
 
-    # for b in boards:
-    #     print(str(b))
-    #     print()
+
+def parse_data(data):
+    randnums = [int(_) for _ in data[0].split(",")]
+
+    boards = []
+    board_lines = []
+    for s in data[2:]:
+        board_lines.append(s)
+        if len(board_lines) == 6:
+            boards.append(Board(board_lines[:-1]))
+            board_lines = []
+    boards.append(Board(board_lines))
+    return randnums, boards
 
 
-def star2():
-    ...
+@timeit
+def star1(randnums, boards):
+    winners = play_boards(randnums, boards, max_wins=1)
+    print(winners[0])
 
-star1(data)
-star2()
+
+@timeit
+def star2(randnums, boards):
+    winners = play_boards(randnums, boards)
+    print(winners[-1])
+
+
+randnums, boards = parse_data(data)
+star1(randnums, boards)
+star2(randnums, boards)
