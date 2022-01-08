@@ -17,34 +17,29 @@ scoremap = {
     ">": 25137
 }
 
+
 def validate_string(s: str):
-    org = s[:]
     slen = len(s)
     s = s.replace("{}", "").replace("()", "").replace("[]", "").replace("<>", "")
     while slen != len(s):
         slen = len(s)
         s = s.replace("{}", "").replace("()", "").replace("[]", "").replace("<>", "")
-        # print(s)
 
     missing = ""
-    for i, c in enumerate(s):
-        if c in ")]}>":
+    for c in s:
+        if c in scoremap:
             missing = c
             break
     score = scoremap[missing]
-    # if score > 0:
-    #     print(org, "->", s, end="")
-    #     print(f"  score: {score} (missing '{missing}'")
     return score, s
 
 
 @timeit
 def star1(data):
-    res = 0
-    for d in data:
-        v, _ = validate_string(d)
-        res += v
+    # Here we're only interested in the first item in the resulting tuple (int, str)
+    res = sum(validate_string(_)[0] for _ in data)
     print(res)
+
 
 closing_map = {
     "(": ")",
@@ -53,15 +48,16 @@ closing_map = {
     "<": ">"
 }
 
+
 def complete_string(s: str) -> int:
-    res = ""
+    res = []
     stack = [" "]
     for c in s[::-1]:
-        if c in "([{<":
+        if c in closing_map:
             if stack[-1] == closing_map[c]:
                 stack.pop()
             else:
-                res += closing_map[c]
+                res.append(closing_map[c])
         if c in closing_map.values():
             stack.append(c)
     return res
@@ -73,12 +69,15 @@ scoring = {
     "}": 3,
     ">": 4
 }
-def score_string(s: str) -> int:
+
+
+def score_completion_chars(completion_chars) -> int:
     res = 0
-    for c in s:
+    for c in completion_chars:
         res *= 5
         res += scoring[c]
     return res
+
 
 @timeit
 def star2(data):
@@ -87,15 +86,11 @@ def star2(data):
         v, s = validate_string(d)
         if v != 0:
             continue
-        completed = complete_string(s)
-        res = score_string(completed)
-        scores.append(res)
-        # print(f"{d} -> {s} ({v}) ==> {completed}")
+        scores.append(score_completion_chars(complete_string(s)))
 
     scores = sorted(scores)
-    # print(scores)
-    # print(len(scores)//2)
     print(scores[(len(scores) // 2)])
+
 
 star1(data)
 star2(data)

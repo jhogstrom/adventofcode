@@ -33,7 +33,6 @@ class Line():
     def isHorizontal(self):
         return self.start.x == self.end.x
 
-
     def isVertical(self):
         return self.start.y == self.end.y
 
@@ -44,15 +43,14 @@ class Line():
 
     def span(self):
         res = []
-        yrange = None
         if self.isVertical():
-            segy = [self.start.x, self.end.x]
-            for x in range(min(segy), max(segy) + 1):
+            line_ends = [self.start.x, self.end.x]
+            for x in range(min(line_ends), max(line_ends) + 1):
                 res.append(Coord(x, self.start.y))
 
         if self.isHorizontal():
-            segy = [self.start.y, self.end.y]
-            for y in range(min(segy), max(segy) + 1):
+            line_ends = [self.start.y, self.end.y]
+            for y in range(min(line_ends), max(line_ends) + 1):
                 res.append(Coord(self.start.x, y))
 
         if self.isDiagonal():
@@ -86,44 +84,46 @@ class Line():
     def __str__(self) -> str:
         return f"{self.start} -> {self.end}"
 
+
 def parse(line):
     c1, _, c2 = line.split()
     return CoordFromLine(c1), CoordFromLine(c2)
 
 
 def printgrid(d: dict):
-    maxsize = 13
-    for y in range(maxsize):
-        for x in range(maxsize):
+    maxsize_x = max(_[0] for _ in d)
+    maxsize_y = max(_[1] for _ in d)
+    maxsize_x = maxsize_y = 13
+    for y in range(maxsize_y):
+        for x in range(maxsize_x):
             v = d[(x, y)]
             if v == 0: v = "."
             print(f" {v}", end="")
         print()
 
-def dowork(data, includeHorizontal):
+
+def dowork(data, includeDiagonal):
     grid = []
     for row in data:
         l = Line(*parse(row))
 
-        if l.isHorizontal() or l.isVertical() or (includeHorizontal and l.isDiagonal()):
+        if l.isHorizontal() or l.isVertical() or (includeDiagonal and l.isDiagonal()):
             grid.extend(l.span())
-
 
     counter = defaultdict(int)
     for c in grid:
         counter[(c.x, c.y)] += 1
-    # printgrid(counter)
+    printgrid(counter)
 
-    c = 0
-    for k, v in counter.items():
-        if v > 1:
-            c += 1
-
-    print(c)
+    # Count all coordinates hit by more than 1 line.
+    print(sum(1 for _ in counter.values() if _ > 1))
 
 
+@timeit
 def star1(data):
     dowork(data, False)
+
+@timeit
 def star2(data):
     dowork(data, True)
 

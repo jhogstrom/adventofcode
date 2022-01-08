@@ -10,11 +10,12 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = [_.strip() for _ in open(filename, 'r').readlines()]
 
+
 d = []
 for r in data:
-    x = [int(_) for _ in r]
     d.append([int(_) for _ in r])
 data = d
+
 
 def printgrid(data, flashes, gen):
     print(f"===After step {gen}:")
@@ -22,7 +23,6 @@ def printgrid(data, flashes, gen):
         print(" ".join(str(_) for _ in r))
     print(f"FLASHES: {flashes}")
 
-seen = []
 
 class Coord():
     def __init__(self, x, y) -> None:
@@ -45,7 +45,7 @@ class Coord():
         return f"({self.x}, {self.y})"
 
     def __hash__(self) -> int:
-        return hash(str(self))
+        return hash((self.x, self.y))
 
     def __eq__(self, __o: object) -> bool:
         return self.x == __o.x and self.y == __o.y
@@ -77,6 +77,7 @@ def reset_flashers(data):
                 res += 1
     return res
 
+
 def make_generation(data):
     global flashed
     flashed = []
@@ -97,6 +98,7 @@ def make_generation(data):
     res = reset_flashers(data)
     return res
 
+
 @timeit
 def star1(data):
     totalsteps = 100
@@ -106,6 +108,7 @@ def star1(data):
         res += make_generation(data)
 
     print(res)
+
 
 @timeit
 def star2(data):
@@ -118,6 +121,7 @@ def star2(data):
         if r == datasize:
             print(c+1)
             return
+
 
 data2 = data[:]
 star1(data)

@@ -25,14 +25,17 @@ def star1(data):
 def stringcontains(target, value):
     return set(target) & set(value) == set(target)
 
+
 def commonsegments(target, value, commoncount) -> bool:
     return len(set(target) & set(value)) == commoncount
+
 
 def mapdigit(s, signals):
     for k, v in signals.items():
         if set(v) == set(s):
             return str(k)
     raise KeyError
+
 
 @timeit
 def star2(data):
@@ -43,12 +46,20 @@ def star2(data):
         signals = [_.strip() for _ in signals.split()]
 
         signalmap = {}
+        # Map signals to a map based on segments in the signal
+        # 1 is the only signal with 2 segments
         signalmap[1] = list(filter(lambda x: len(x) == 2, signals))[0]
         signals.remove(signalmap[1])
+
+        # 7 is the only signal with 3 segments
         signalmap[7] = list(filter(lambda x: len(x) == 3, signals))[0]
         signals.remove(signalmap[7])
+
+        # 4 is the only signal with 4 segments
         signalmap[4] = list(filter(lambda x: len(x) == 4, signals))[0]
         signals.remove(signalmap[4])
+
+        # 8 is the only signal with 7 segments
         signalmap[8] = list(filter(lambda x: len(x) == 7, signals))[0]
         signals.remove(signalmap[8])
 
@@ -76,10 +87,8 @@ def star2(data):
         signalmap[2] = signals[0]
         signals.remove(signalmap[2])
 
-        v = ""
-        for d in output:
-            v += mapdigit(d, signalmap)
-        res += int(v)
+        # Map each output reading to a digit (as string), concatenate them and convert the result to int.
+        res += int("".join(mapdigit(d, signalmap) for d in output))
 
     print(res)
 
