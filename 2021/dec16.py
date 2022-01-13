@@ -45,7 +45,7 @@ class Node:
 
         self.version = self.eat(3)
         self.typeid = self.eat(3)
-        print(" " * level, self.version, self.typeid, f"({level})")
+        # print(" " * level, self.version, self.typeid, f"({level})")
         if self.typeid == 4:
             self.value = self.parse_value()
         else:
@@ -100,17 +100,20 @@ def print_tree(n: Node, level=0):
 @timeit
 def star1(data):
     binary = bin(int(data, 16))[2:]
+    # Since we lost zero-padding, first pad it to an even 4-byte chunk
     while len(binary) % 4:
         binary = "0" + binary
+    # Now add 4-byte-chunks for all leading zeroes
     c = 0
     while data[c] == "0":
-        binary = "0000" + binary
         c += 1
+    binary = "0000" * c + binary
 
-    print(f"{data} => {binary}")
+
+    # print(f"{data} => {binary}")
     n = Node(binary)
-    print(str(n))
-    print(n.calc_value())
+    print(f"Star1: {str(n)}")
+    print(f"Star2: {n.calc_value()}")
 
 
 star1(data[0])

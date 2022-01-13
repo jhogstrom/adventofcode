@@ -44,19 +44,15 @@ class LinkedList():
 
 
 def parse_data(data):
-    template = data[0]
-    pairs = data[2:]
     rules = {}
-    for p in pairs:
+    for p in data[2:]:
         from_, to = p.split(" -> ")
         rules[from_] = to
 
-    res = LinkedList()
-    for c in template:
-        n = Node(c)
-        res.append(n)
+    initial_chain = LinkedList()
+    [initial_chain.append(Node(c)) for c in data[0]]
 
-    return res, rules
+    return initial_chain, rules
 
 
 def make_gen(template, rules):
@@ -81,19 +77,17 @@ def get_counts(template):
 
 
 @timeit
-def star1(template, rules):
-    for g in range(10):
+def star1(template, rules, generations):
+    for g in range(1, generations + 1):
         make_gen(template, rules)
 
     counts = get_counts(template)
-    print("diff", g+1, max(counts.values()) - min(counts.values()))
+    print("diff", g, max(counts.values()) - min(counts.values()))
 
 
 @timeit
-def star2(template, rules):
-    pairs = {}
-    for p in rules:
-        pairs[p] = 0
+def star2(template, rules, generations):
+    pairs = defaultdict(int)
     c = template.head
 
     counts = defaultdict(int)
@@ -103,7 +97,7 @@ def star2(template, rules):
         c = c.next
     counts[c.value] += 1
 
-    for g in range(40):
+    for g in range(1, generations+1):
         nextgen = defaultdict(int)
         for p in pairs:
             counts[rules[p]] += pairs[p]
@@ -111,10 +105,10 @@ def star2(template, rules):
             nextgen[rules[p] + p[1]] += pairs[p]
         pairs = {**nextgen}
 
-    print("diff", g+1, max(counts.values()) - min(counts.values()))
+    print("diff", g, max(counts.values()) - min(counts.values()))
 
 
 # In retrospect, star1 could easily be solved by star2.
 # Keeping star1 solution to show how the solution doesn't scale :)
-star1(*parse_data(data))
-star2(*parse_data(data))
+star1(*parse_data(data), 10)
+star2(*parse_data(data), 40)

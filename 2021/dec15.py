@@ -46,7 +46,7 @@ class Node():
 
 
 def get_neighbors(maze, current):
-    res = []
+    res = set()
     for neighbor_pos in [
                      (-1, 0),
             (0, -1),            (0, 1),
@@ -57,7 +57,7 @@ def get_neighbors(maze, current):
         nextx = current.pos[0] + neighbor_pos[0]
         if nextx < 0 or nexty < 0 or nextx == len(maze) or nexty == len(maze):
             continue
-        res.append(Node(current, (nextx, nexty), maze[nexty][nextx]))
+        res.add(Node(current, (nextx, nexty), maze[nexty][nextx]))
     return res
 
 
@@ -100,13 +100,8 @@ def dijkstra(maze, start, end):
                 current = current.parent
             return path[::-1] # Return reversed path
 
-        for child in [_ for _ in get_neighbors(maze, current) if _ not in visited]:
-            if child in visited:
-                vnode = [_ for _ in visited if _ == child]
-                if vnode.cost > child.cost:
-                    print(f"Replacing {vnode} with {child}")
-                    vnode.set_parent(current)
-            candidates.add(child)
+        # Add non-visited neighbors to candidates
+        candidates |= get_neighbors(maze, current) - visited
 
 
 @timeit

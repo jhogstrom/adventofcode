@@ -60,14 +60,8 @@ def star1(targetarea: str):
                     # print(c, "overshoot")
                     break
 
-    print("Highest", best_y)
-    print("Found", found)
+    print("Star1: Highest", best_y)
+    print("Star2: Found", found)
 
 
-@timeit
-def star2(data):
-    ...
-
-data2 = data[:]
 star1(data[0])
-star2(data2)

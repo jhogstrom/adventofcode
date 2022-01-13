@@ -5,7 +5,7 @@ from collections import defaultdict, deque
 stardate = 13
 dataname = f"dec{stardate}.txt"
 # dataname = f"dec{stardate}_test.txt"
-dataname = f"dec{stardate}_extra.txt"
+# dataname = f"dec{stardate}_extra.txt"
 curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = [_.strip() for _ in open(filename, 'r').readlines()]
@@ -28,12 +28,7 @@ def read_data(data):
 
 
 def count_dots(dots):
-    dotvals = defaultdict(int)
-    for d in dots:
-        p = (d[0], d[1])
-        dotvals[(d[0], d[1])] = 1
-
-    return sum(dotvals.values())
+    return len(set(tuple(_) for _ in dots))
 
 
 def make_fold(fold, dots):
@@ -50,17 +45,16 @@ def make_fold(fold, dots):
 
 def print_data(dots):
     maxy = max(_[1] for _ in dots) + 1
-    lines = []
-    for y in range(maxy):
-        lines.append([])
+    lines = [[] for _ in range(maxy)]
+    charmap = {True: '#', False: ' '}
     for d in dots:
         lines[d[1]].append(d[0])
     for line in lines:
-        s = ""
+        s = []
         if line:
             for x in range(max(line) + 1):
-                s += "#" if x in line else " "
-        print(s)
+                s.append(charmap[x in line])
+        print("".join(s))
 
 
 @timeit
@@ -80,6 +74,6 @@ def star2(data):
 
     print_data(dots)
 
-data2 = data[:]
-# star1(data)exit()
-star2(data2)
+
+star1(data)
+star2(data)
