@@ -1,7 +1,6 @@
 import os
 from timer import timeit
-from collections import defaultdict, deque
-import concurrent.futures
+from collections import defaultdict
 
 
 stardate = 20
@@ -12,6 +11,9 @@ filename = f'{curdir}\\{dataname}'
 data = [_.strip() for _ in open(filename, 'r').readlines()]
 if not data:
     raise FileNotFoundError(f"No data in {dataname}")
+
+
+map_to_binary_digit = { True: "1", False: "0"}
 
 
 def print_image(image):
@@ -26,96 +28,47 @@ def print_image(image):
     print("==")
 
 
-def generate_line(y, image, filter, xmin, xmax):
-    bitmap = { True: "1", False: "0"}
-    res = {}
-    for x in range(xmin-1, xmax+2):
-        index = []
-        for yi in range(y-1, y+2):
-            for xi in range(x-1, x+2):
-                index.append(bitmap[image[(xi, yi)]])
-        indexb = "".join(index)
-        index = int(indexb, 2)
-        res[(x, y)] = filter[index] == "#"
-        # print("Adding", filter[index] == "#")
-    # print(res)
-    return res
-
-
 def constant_factory(value):
     return lambda: value
 
 
-def apply_filter_multithread(image: defaultdict, filter):
-    yrange = set(_[1] for _ in image)
-    xrange = set(_[0] for _ in image)
-    xmin = min(xrange)
-    xmax = max(xrange)
-
-    ix = 511 if image.default_factory() else 0
-    res = defaultdict(constant_factory(filter[ix] == "#"))
-    futures = []
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
-        for y in range(min(yrange)-1, max(yrange)+2):
-            futures.append(executor.submit(generate_line, y, image, filter, xmin, xmax))
-
-    for line in [f.result() for f in futures]:
-        res |= line
-
-    # yrange = set(_[1] for _ in res)
-    # xrange = set(_[0] for _ in res)
-    # print(f"BB: ({min(xrange)}, {min(yrange)}) -> ({max(xrange)}, {max(yrange)})")
-
-    return res
-
-def apply_filter(image: defaultdict, filter):
+def apply_filter(image: defaultdict, filter) -> defaultdict:
     yrange = [_[1] for _ in image]
     xrange = [_[0] for _ in image]
-    xmin = min(xrange)
-    xmax = max(xrange)
+    x_scan_range = range(min(xrange)-1, max(xrange)+2)
+    y_scan_range = range(min(yrange)-1, max(yrange)+2)
 
     ix = 511 if image.default_factory() else 0
-    res = defaultdict(constant_factory(filter[ix] == "#"))
-    bitmap = { True: "1", False: "0"}
-    resmap = {"#": True, ".": False}
+    res = defaultdict(constant_factory(filter[ix]))
 
-    for y in range(min(yrange)-1, max(yrange)+2):
+    for y in y_scan_range:
         ypixrange = range(y-1, y+2)
-        for x in range(xmin-1, xmax+2):
+        for x in x_scan_range:
             xpixrange = range(x-1, x+2)
             index = []
             for yi in ypixrange:
                 for xi in xpixrange:
-                    index.append(bitmap[image[(xi, yi)]])
-            indexb = "".join(index)
-            index = int(indexb, 2)
-            res[(x, y)] = resmap[filter[index]]
-    # print(f"BB: ({min(xrange)}, {min(yrange)}) -> ({max(xrange)}, {max(yrange)})")
-
+                    index.append(map_to_binary_digit[image[(xi, yi)]])
+            res[(x, y)] = filter[int("".join(index), 2)]
     return res
 
+
 def count_pixels(image):
-    return len([_ for _ in image.values() if _])
+    return sum(1 for _ in image.values() if _)
 
 
 @timeit
 def evolve_image(data, gen_count):
-    filter = data[0]
+    filter = [_ == "#" for _ in data[0]]
     assert(len(filter) == 512)
-    image = defaultdict(constant_factory(filter[0] == "."))
+    image = defaultdict(constant_factory(not filter[0]))
 
-    for i, s in enumerate(data[2:]):
-        for j, c in enumerate(s):
-            image[(j, i)] = c == "#"
+    for y, s in enumerate(data[2:]):
+        for x, c in enumerate(s):
+            image[(x, y)] = c == "#"
 
-    # print_image(image)
-    # print(count_pixels(image))
-
-    for i in range(gen_count):
+    for _ in range(gen_count):
         image = apply_filter(image, filter)
-        # print_image(image)
-        # print(i+1, count_pixels(image))
     # print_image(image)
     print(count_pixels(image))
 
