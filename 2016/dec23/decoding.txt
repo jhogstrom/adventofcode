@@ -1,0 +1,28 @@
+00 cpy a b
+01 dec b            # b = A-1
+02 cpy a d
+03 cpy 0 a
+04 cpy b c  <----+
+05 inc a    <--+ |
+06 dec c       | |
+07 jnz c -2   -+ |  # Happens A-1 times
+08 dec d         |
+09 jnz d -5   ---+  # Happens A times
+#                # a = A*(A-1) = A^2 - A
+10 dec b            # b = A-2
+11 cpy b c          # c = A-2
+12 cpy c d          # d = A-2
+13 dec d     <--+
+14 inc c        |
+15 jnz d -2   --+   # Happens A-2 times
+#                # c = 2(A-2) = 2A - 4
+16 tgl c            #
+17 cpy -16 c
+18 jnz 1 c
+19 cpy 75 c
+20 jnz 85 d   <---+
+21 inc a      <-+ |
+22 inc d        | |
+23 jnz d -2   --+ |
+24 inc c          |     # Changes to inc c
+25 jnz c -5   ----+
