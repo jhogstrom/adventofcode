@@ -10,18 +10,15 @@ else:
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
-data = [_.strip() for _ in open(filename, 'r').readlines()]
+data = open(filename, "r").read().splitlines()
 
 if not data:
     raise FileNotFoundError(f"No data in {dataname}")
 
 
 def makerange(s: str) -> set:
-    result = set()
     start, end = [int(_) for _ in s.split("-")]
-    for _ in range(start, end+1):
-        result.add(_)
-    return result
+    return set(range(start, end+1))
 
 
 def star1():
