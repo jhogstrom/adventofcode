@@ -1,4 +1,3 @@
-from collections import defaultdict
 import os
 
 runtest = False
@@ -22,4 +21,4 @@ def star(s, size):
 
 
 print("star1", star(data[0], 4))
-print("star1", star(data[0], 14))
+print("star2", star(data[0], 14))
