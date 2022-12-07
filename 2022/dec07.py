@@ -22,7 +22,6 @@ class Node:
     def __str__(self) -> str:
         return self.fullname()
 
-    # @property
     def size(self):
         return self._size
 
@@ -114,3 +113,16 @@ def star2():
 
 print("star1:", star1())
 print("star2:", star2())
+
+
+def flatten(node):
+    result = [node.size()]
+    for _ in [d for d in node.children if isinstance(d, Directory)]:
+        result.extend(flatten(_))
+    return result
+
+
+sizes = flatten(parse_data())
+free_space = 70_000_000 - sizes[0]
+print("star1:", sum([_ for _ in sizes if _ < 100000]))
+print("star2:", min([_ for _ in sizes if _ + free_space > 30_000_000]))
