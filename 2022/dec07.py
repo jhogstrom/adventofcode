@@ -46,20 +46,6 @@ class File(Node):
         self._size = size
 
 
-def get_sizes(d, level: int = 0):
-    global totalsize
-    size = d.size()
-    # print("-" * level, d.fullname(), size)
-    if size <= 100000:
-        totalsize = size
-    else:
-        totalsize = 0
-    for c in d.children:
-        if isinstance(c, Directory):
-            totalsize += get_sizes(c, level+1)
-    return totalsize
-
-
 def parse_data():
     root = Directory("$", None)
     cwd = root
@@ -82,6 +68,22 @@ def parse_data():
         else:
             cwd.children.append(File(parts[1], cwd, int(parts[0])))
     return root
+
+
+totalsize = 0
+
+def get_sizes(d, level: int = 0):
+    global totalsize
+    size = d.size()
+    # print("-" * level, d.fullname(), size)
+    if size <= 100000:
+        totalsize = size
+    else:
+        totalsize = 0
+    for c in d.children:
+        if isinstance(c, Directory):
+            totalsize += get_sizes(c, level+1)
+    return totalsize
 
 
 def star1():
@@ -115,6 +117,7 @@ print("star1:", star1())
 print("star2:", star2())
 
 
+# Equivalent solution, slightly less code
 def flatten(node):
     result = [node.size()]
     for _ in [d for d in node.children if isinstance(d, Directory)]:
@@ -124,5 +127,5 @@ def flatten(node):
 
 sizes = flatten(parse_data())
 free_space = 70_000_000 - sizes[0]
-print("star1:", sum([_ for _ in sizes if _ < 100000]))
+print("star1:", sum([_ for _ in sizes if _ < 100_000]))
 print("star2:", min([_ for _ in sizes if _ + free_space > 30_000_000]))
