@@ -33,42 +33,6 @@ def get_bottommost(data, x, y) -> str:
     return res
 
 
-def debug(s):
-    # print(s)
-    pass
-
-
-def star1():
-    res = 2 * len(data[0]) + 2 * len(data) - 4
-    for x in range(1, len(data[0])-1) :
-        for y in range(1, len(data)-1):
-            tree = data[y][x]
-            line = data[y][:x]
-            if tallest(tree, line):
-                res += 1
-                debug(f"from left {tree} {line}, {data[y]}")
-                continue
-
-            line = data[y][x+1:]
-            if tallest(tree, line):
-                res += 1
-                debug(f"from right {tree} {line}, {data[y]}")
-                continue
-
-            line = get_topmost(data, x, y)
-            if tallest(tree, line):
-                res += 1
-                debug(f"from top {tree} {line}, {data[y]}")
-                continue
-
-            line = get_bottommost(data, x, y)
-            if tallest(tree, line):
-                res += 1
-                debug(f"from bottom {tree} {line}, {data[y]}")
-                continue
-    return res
-
-
 def count_smaller(tree, trees) -> int:
     res = 0
     for _ in trees:
@@ -78,34 +42,38 @@ def count_smaller(tree, trees) -> int:
     return res
 
 
-def star2():
-    res = 0
-    for x in range(1, len(data[0])-1) :
+def star():
+    star1 = 2 * len(data[0]) + 2 * len(data) - 4
+    star2 = 0
+    for x in range(1, len(data[0])-1):
         for y in range(1, len(data)-1):
+            istallest, viewscore = False, 1
             tree = data[y][x]
+
+            # left
             line = data[y][:x][::-1]
-            look_left = count_smaller(tree, line)
-            debug(f"left : {tree}: {line} -> {look_left}")
+            istallest |= tallest(tree, line)
+            viewscore *= count_smaller(tree, line)
 
+            # right
             line = data[y][x+1:]
-            look_right = count_smaller(tree, line)
-            debug(f"right: {tree}: {line} -> {look_right}")
+            istallest |= tallest(tree, line)
+            viewscore *= count_smaller(tree, line)
 
+            # up
             line = get_topmost(data, x, y)[::-1]
-            look_up = count_smaller(tree, line)
-            debug(f"up   : {tree}: {line} -> {look_up}")
+            istallest |= tallest(tree, line)
+            viewscore *= count_smaller(tree, line)
 
+            # down
             line = get_bottommost(data, x, y)
-            look_down = count_smaller(tree, line)
-            debug(f"down : {tree}: {line} -> {look_down}")
-
-            score = look_down*look_up*look_right*look_left
-            # if score > res:
-            #     print(f"({x+1}, {y+1}): {tree} -> {score} ({look_up}, {look_right}, {look_down}, {look_left})")
-            res = max([res, score])
-
-    return res
+            istallest |= tallest(tree, line)
+            viewscore *= count_smaller(tree, line)
+            if istallest:
+                star1 += 1
+            star2 = max([star2, viewscore])
+    print("star1", star1)
+    print("star2", star2)
 
 
-print("star1:", star1())
-print("star2:", star2())
+star()
