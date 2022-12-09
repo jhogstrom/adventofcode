@@ -26,7 +26,7 @@ class Node:
         return self._size
 
     def fullname(self):
-        if self.parent == None:
+        if self.parent is None:
             return "$"
         return self.parent.fullname() + "/" + self.name
 
@@ -71,6 +71,7 @@ def parse_data():
 
 
 totalsize = 0
+
 
 def get_sizes(d, level: int = 0):
     global totalsize
