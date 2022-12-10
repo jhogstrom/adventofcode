@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 from typing import List
 
 runtest = False
@@ -99,7 +98,6 @@ class Rope():
             self.trail.append(str(self.tail))
 
             # print(move, moves[m], self.head, len(self.tvisited))
-
 
     def print(self, s: str = None):
         lines = []
