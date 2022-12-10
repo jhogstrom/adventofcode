@@ -12,18 +12,17 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = open(filename, "r").read().splitlines()
 
+PIX_WIDTH = 3
+
 
 class Cpu():
-    def __init__(self, code, debug: bool = False) -> None:
-        self.code = code
-        self.cycle = 0
-        self.pc = 0
-        self.x = 1
-        self.total_strength = 0
-        self.monitor = []
+    def __init__(self, debug: bool = False) -> None:
         self._debug = debug
+        self.cycle = self.total_strength = 0
+        self.x = 1
+        self.monitor = []
         for row in range(6):
-            self.monitor.append([" " for _ in range(40)])
+            self.monitor.append([" " * PIX_WIDTH for _ in range(40)])
 
     @property
     def row(self):
@@ -36,7 +35,7 @@ class Cpu():
     def inc_cycle(self):
         hpos = self.cycle % 40
         if hpos in [self.x-1, self.x, self.x+1]:
-            self.monitor[self.row][hpos] = "#"
+            self.monitor[self.row][hpos] = "#" * PIX_WIDTH
 
         self.cycle += 1
         if (self.cycle - 20) % 40 == 0:
@@ -50,8 +49,7 @@ class Cpu():
     def addx(self, *args):
         self.inc_cycle()
         self.inc_cycle()
-        v = int(args[0])
-        self.x += v
+        self.x += int(args[0])
 
     def exec(self, op: str):
         if op == "noop":
@@ -60,28 +58,15 @@ class Cpu():
             return self.addx
         raise ValueError(f"No such op: {op}")
 
-    def execute(self):
-        instr = self.code[self.pc].split()
+    def execute(self, instr):
+        instr = instr.split()
         self.exec(instr[0])(*instr[1:])
-        self.pc += 1
-        self.debug(f"{self.pc}({self.cycle}) - {instr[0]}({','.join(instr[1:])}) :: {self.x}")
+        self.debug(f"({self.cycle}) - {instr[0]}({','.join(instr[1:])}) :: {self.x}")
 
 
-def star1():
-    cpu = Cpu(data)
-    while cpu.pc < len(data):
-        cpu.execute()
-    return cpu.total_strength
+cpu = Cpu()
+[cpu.execute(_) for _ in data]
 
-
-def star2():
-    cpu = Cpu(data)
-    while cpu.pc < len(data):
-        cpu.execute()
-    for r in range(6):
-        print("".join(cpu.monitor[r]))
-
-
-print("star1:", star1())
-print("star2")
-star2()
+print("star1:", cpu.total_strength)
+for r in range(6):
+    print("star2: ", "".join(cpu.monitor[r]))
