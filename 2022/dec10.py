@@ -1,16 +1,4 @@
-import os
-
-runtest = False
-stardate = "10"
-if runtest:
-    dataname = f"dec{stardate}test.txt"
-    print("USING TESTDATA")
-else:
-    dataname = f"dec{stardate}.txt"
-
-curdir = os.path.dirname(os.path.abspath(__file__))
-filename = f'{curdir}\\{dataname}'
-data = open(filename, "r").read().splitlines()
+data = open(0).read().splitlines()
 
 PIX_WIDTH = 3
 
@@ -70,3 +58,6 @@ cpu = Cpu()
 print("star1:", cpu.total_strength)
 for r in range(6):
     print("star2: ", "".join(cpu.monitor[r]))
+
+# Powershell: Get-Content dec10.txt | python .\dec10.py
+# cmd:
