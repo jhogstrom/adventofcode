@@ -60,4 +60,4 @@ for r in range(6):
     print("star2: ", "".join(cpu.monitor[r]))
 
 # Powershell: Get-Content dec10.txt | python .\dec10.py
-# cmd:
+# cmd: python dec10.py < dec10.txt
