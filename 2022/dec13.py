@@ -21,7 +21,6 @@ def comp(left, right) -> int:
     if left < right:
         return -1
     return 1
-    # return 0 if left == right else -1 if left < right else 1
 
 
 def compare(left, right, level=0) -> int:
