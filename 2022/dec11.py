@@ -65,7 +65,7 @@ class Monkey():
 def solve(rounds: int, reducer):
     monkeys = {i//7: Monkey(data[i:i+6], reducer) for i in range(0, len(data), 7)}
 
-    # for i in monkeys:
+    # for i in monkeys:  # NOSONAR
     #     print(i, monkeys[i].desc())
 
     all_test_values = reduce(lambda x, y: x * y, [_.test for _ in monkeys.values()])

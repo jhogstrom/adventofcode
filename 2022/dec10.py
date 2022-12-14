@@ -9,7 +9,7 @@ class Cpu():
         self.cycle = self.total_strength = 0
         self.x = 1
         self.monitor = []
-        for row in range(6):
+        for row in range(6):  # NOSONAR
             self.monitor.append([" " * PIX_WIDTH for _ in range(40)])
 
     @property

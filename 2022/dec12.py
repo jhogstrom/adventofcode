@@ -1,5 +1,4 @@
 import os
-from timing import timeit
 
 runtest = False
 stardate = "12"
@@ -12,7 +11,7 @@ data = open(filename, "r").read().splitlines()
 
 
 class Cell():
-    def __init__(self, x: int, y: int, data, parent = None) -> None:
+    def __init__(self, x: int, y: int, data, parent=None) -> None:
         self.x = x
         self.y = y
         self.data = data
@@ -86,12 +85,11 @@ def print_path(p):
         print(f"{i:>3} {n}")
 
 
-def solve(start: Cell):
+def solve(start: Cell):  # NOSONAR
     goal = find_position("E")
 
     to_visit = [start]
     visited = []
-    i = 0
     while len(to_visit) > 0:
         curr = to_visit[0]
         index = 0
@@ -120,7 +118,7 @@ def star1():
     return len(p)-1
 
 
-def star2():
+def star2():  # NOSONAR
     seen_starts = []
     min_steps = 999999
     for y, row in enumerate(data):

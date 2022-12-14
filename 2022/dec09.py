@@ -13,7 +13,7 @@ curdir = os.path.dirname(os.path.abspath(__file__))
 filename = f'{curdir}\\{dataname}'
 data = open(filename, "r").read().splitlines()
 
-# data = [
+# data = [  # NOSONAR
 #     "R 5",
 #     "U 8",
 #     "L 8",
@@ -99,7 +99,7 @@ class Rope():
 
             # print(move, moves[m], self.head, len(self.tvisited))
 
-    def print(self, s: str = None):
+    def print(self, s: str = None):  # NOSONAR
         lines = []
         rope = [str(_) for _ in self.knots]
         x = [_.x for _ in self.knots]
