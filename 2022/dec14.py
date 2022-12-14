@@ -94,16 +94,18 @@ def star1():
 
 def star2():
     cave = Cave(data)
-    bottom = cave.bottom()
-    # Add bottom floor that's pretty wide. Not exactly infinity, but hey...
-    for x in range(-10_000, 10_000):
-        cave.cells.add(Cell(x, bottom+2))
+    bottom = cave.bottom() + 2
+    bottomleft = Cell(500 - bottom - 1, bottom)
+    bottomright = Cell(500 + bottom + 1, bottom)
+    for c in bottomleft.line_to(bottomright):
+        cave.add_cell(c)
     cave_full = False
 
     while not cave_full:
         cave_full = cave.drop_sand()
 
     return len(cave.sand)
+
 
 print("star1:", star1())
 print("star2:", star2())
