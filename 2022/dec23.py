@@ -24,12 +24,6 @@ class Node():
     def __hash__(self) -> int:
         return hash((self.x, self.y))
 
-    def __str__(self) -> str:
-        return f"({self.x}, {self.y})"
-
-    def __repr__(self) -> str:
-        return str(self)
-
     def n_n(self):
         return {(self.x-1, self.y-1), (self.x, self.y-1), (self.x+1, self.y-1)}
 
