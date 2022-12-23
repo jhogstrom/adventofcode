@@ -228,37 +228,37 @@ def star2():
         p5 = m.extract_plane(w, 1, 2)
         p6 = m.extract_plane(w, 0, 3)
 
-        # from p1 (top)
+        # from p1
         edges.update(connect(toprow(p1), d["^"], leftcol(p6), d[">"]))
         edges.update(connect(rightcol(p1), d[">"], leftcol(p2), d[">"]))
         edges.update(connect(bottomrow(p1), d["v"], toprow(p3), d["v"]))
         edges.update(connect(leftcol(p1), d["<"], leftcol(p4)[::-1], d[">"]))
 
-        # from p2 (back)
+        # from p2
         edges.update(connect(toprow(p2), d["^"], bottomrow(p6), d["^"]))
         edges.update(connect(rightcol(p2), d[">"], rightcol(p5)[::-1], d["<"]))
         edges.update(connect(bottomrow(p2), d["v"], rightcol(p3), d["<"]))
         edges.update(connect(leftcol(p2), d["<"], rightcol(p1), d["<"]))
 
-        # from p3 (left)
+        # from p3
         edges.update(connect(toprow(p3), d["^"], bottomrow(p1), d["^"]))
         edges.update(connect(rightcol(p3), d[">"], bottomrow(p2), d["^"]))
         edges.update(connect(bottomrow(p3), d["v"], toprow(p5), d["v"]))
         edges.update(connect(leftcol(p3), d["<"], toprow(p4), d["v"]))
 
-        # from p4 (front)
+        # from p4
         edges.update(connect(toprow(p4), d["^"], leftcol(p3), d[">"]))
         edges.update(connect(rightcol(p4), d[">"], leftcol(p5), d[">"]))
         edges.update(connect(bottomrow(p4), d["v"], toprow(p6), d["v"]))
         edges.update(connect(leftcol(p4), d["<"], leftcol(p1)[::-1], d[">"]))
 
-        # from p6 (right)
+        # from p6
         edges.update(connect(toprow(p6), d["^"], bottomrow(p4), d["^"]))
         edges.update(connect(rightcol(p6), d[">"], bottomrow(p5), d["^"]))
         edges.update(connect(bottomrow(p6), d["v"], toprow(p2), d["v"]))
         edges.update(connect(leftcol(p6), d["<"], toprow(p1), d["v"]))
 
-        # from p5 (right)
+        # from p5
         edges.update(connect(toprow(p5), d["^"], bottomrow(p3), d["^"]))
         edges.update(connect(rightcol(p5), d[">"], rightcol(p2)[::-1], d["<"]))
         edges.update(connect(bottomrow(p5), d["v"], rightcol(p6), d["<"]))
