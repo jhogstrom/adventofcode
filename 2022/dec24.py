@@ -69,9 +69,9 @@ def neighbors(n, mx, my):
     return [_ for _ in res if -1 <= _[0] <= mx and -1 <= _[1] <= my]
 
 
-def solve1(m, mx, my, start, goal) -> int:
-    print(f"Going from {start} to {goal}.")
-    open_nodes, seen = [(start, 0)], set()
+def solve(m, mx, my, start, goal, start_time=0) -> int:
+    print(f">> Going from {start} to {goal} starting @ {start_time}.")
+    open_nodes, seen = [(start, start_time)], set()
     steps = 0
     while open_nodes:
         steps += 1
@@ -81,41 +81,8 @@ def solve1(m, mx, my, start, goal) -> int:
                 ix = i
         curr = open_nodes.pop(ix)
         t = curr[1]
-        if steps % 1000 == 0:
-            print(steps, t, curr)
-        if (curr[0], t % (mx*my)) in seen:
-            continue
-        seen.add((curr[0], t % (mx*my)))
-        t += 1
-        for n in neighbors(curr[0], mx, my):
-            if (n, t % (mx*my)) in seen:
-                continue
-            # Need to check if target is empty -
-            # this excludes edges and blizzards
-            if len(m[t % (mx*my)][n]) == 0:
-                open_nodes.append((n, t))
-            if n == goal:
-                return t
-
-    raise ValueError(f"{goal} not found after {curr[1]+1} steps.")
-
-
-def solve2(m, mx, my, start, goal, start_time) -> int:
-    print(f">> Going from {start} to {goal} starting @ {start_time}.")
-    open_nodes = [(start, start_time)]
-    seen = set()
-    steps = 0
-    while open_nodes:
-        steps += 1
-        curr = open_nodes[0]
-        ix = 0
-        for i, _ in enumerate(open_nodes):
-            if _[1] < curr[1]:
-                ix = i
-        curr = open_nodes.pop(ix)
-        t = curr[1]
-        if steps % 1000 == 0:
-            print(steps, t, curr)
+        # if steps % 1000 == 0:
+        #     print(steps, t, curr)
         if (curr[0], t % (mx*my)) in seen:
             continue
         seen.add((curr[0], t % (mx*my)))
@@ -139,7 +106,7 @@ def star1(data) -> int:
     my = len(data) - 2
     mx = len(data[0]) - 2
     temporal_map = evolve(m, mx, my)
-    return solve1(temporal_map, mx, my, (0, -1), (mx-1, my))
+    return solve(temporal_map, mx, my, (0, -1), (mx-1, my))
 
 
 def star2(data) -> int:
@@ -148,9 +115,9 @@ def star2(data) -> int:
     mx = len(data[0]) - 2
     temporal_map = evolve(m, mx, my)
 
-    j1 = solve2(temporal_map, mx, my, (0, -1), (mx-1, my), 0)
-    j2 = solve2(temporal_map, mx, my, (mx-1, my), (0, -1), j1)
-    j3 = solve2(temporal_map, mx, my, (0, -1), (mx-1, my), j2+j1)
+    j1 = solve(temporal_map, mx, my, (0, -1), (mx-1, my), 0)
+    j2 = solve(temporal_map, mx, my, (mx-1, my), (0, -1), j1)
+    j3 = solve(temporal_map, mx, my, (0, -1), (mx-1, my), j2+j1)
     return j1 + j2 + j3
 
 
