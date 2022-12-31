@@ -1,4 +1,3 @@
-from collections import defaultdict
 import os
 
 runtest = False
@@ -12,23 +11,7 @@ data = open(filename, "r").read().splitlines()
 
 
 def decode(s) -> int:
-    values = {
-        "=": -2,
-        "-": -1,
-        "0": 0,
-        "1": 1,
-        "2": 2
-    }
-    return sum(values[c] * (5 ** p) for p, c in enumerate(s[::-1]))
-
-
-snafu = {
-    0: "0",
-    1: "1",
-    2: "2",
-    3: "=",
-    4: "-"
-}
+    return sum(("=-012".index(c)-2) * (5 ** p) for p, c in enumerate(s[::-1]))
 
 
 def encode(n):
@@ -37,7 +20,7 @@ def encode(n):
     d, r = divmod(n, 5)
     if r in [3, 4]:
         d += 1
-    return encode(d) + snafu[r]
+    return encode(d) + "012-="[r]
 
 
 def star1():
