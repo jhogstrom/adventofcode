@@ -1,15 +1,12 @@
-import os
 from timer import timeit
 from collections import defaultdict, deque
+import logging
+from reader import get_data
 
-stardate =
-dataname = f"dec{stardate}.txt"
-dataname = f"dec{stardate}_test.txt"
-curdir = os.path.dirname(os.path.abspath(__file__))
-filename = f'{curdir}\\{dataname}'
-data = [_.strip() for _ in open(filename, 'r').readlines()]
-if not data:
-    raise FileNotFoundError(f"No data in {dataname}")
+runtest = False
+stardate = "X"
+
+data = get_data(stardate, runtest)
 
 
 @timeit
@@ -21,6 +18,9 @@ def star1(data):
 def star2(data):
     ...
 
+
 data2 = data[:]
+
+
 star1(data)
 star2(data2)
