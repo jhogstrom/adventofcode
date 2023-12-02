@@ -1,11 +1,11 @@
 import logging
-from timer import timeit
-from reader import get_data
+from reader import get_data, set_logging, timeit
 
 
-runtest = True
+runtest = False
 stardate = "1"
 data = get_data(stardate, runtest)
+set_logging(runtest)
 
 
 @timeit
@@ -56,5 +56,5 @@ def star2():
     print(res)
 
 
-# star1()
+star1()
 star2()

@@ -1,15 +1,11 @@
-from timer import timeit
-from collections import defaultdict, deque
-import logging
-from reader import get_data, set_logging
+from math import prod
+from collections import defaultdict
+from reader import get_data, set_logging, timeit
 
+stardate = "2"
 runtest = True
 runtest = False
 set_logging(runtest)
-stardate = "2"
-
-# logging.basicConfig(level=logging.DEBUG, format="%(message)s")
-
 data = get_data(stardate, runtest)
 
 
@@ -22,29 +18,23 @@ class Game:
         separated by semicolon. Each hand is a set of colored cubes. Each hand is stored as an item in an array
         of hands. Each hand is a dict with color as key and number of cubes as value.
         Args:
-            s (str): _description_
+            s (str): String describing game
         """
         self.gamestr = s
         number, hands = s.split(":")
         self.game_number = int(number.split()[1].strip())
-        self.hands = []
-        for hand in hands.split(";"):
-            self.hands.append(self.parse_hand(hand))
+        self.hands = [self.parse_hand(hand) for hand in hands.split(";")]
 
     def parse_hand(self, hand: str) -> dict:
         """
         Parses a hand string on the form "3 blue, 4 red" into a dict
         Args:
-            hand (str): _description_
+            hand (str): string describing hand on the form <color>: count
         """
-        hand = hand.strip()
         hand_dict = defaultdict(int)
         for cube in hand.split(","):
-            cube = cube.strip()
-            if not cube:
-                continue
-            number, color = cube.split()
-            hand_dict[color] += int(number)
+            count, color = cube.split()
+            hand_dict[color] += int(count)
         return hand_dict
 
     def __repr__(self) -> str:
@@ -54,13 +44,11 @@ class Game:
         """
         Checks if the game is possible with the template set.
         Args:
-            template_set (dict): _description_
+            template_set (dict): counts per color
         """
         for hand in self.hands:
-            for color, number in hand.items():
-                if template_set[color] < number:
-                    logging.debug(f">> {self} \n\t{color}: {number} > {template_set[color]}")
-                    return False
+            if not all(template_set[color] >= number for color, number in hand.items()):
+                return False
         return True
 
     def minimum_set(self) -> dict:
@@ -76,39 +64,21 @@ class Game:
 
 @timeit
 def star1(data):
-    games = []
-    for line in data:
-        games.append(Game(line))
-    # print(games)
-
     template_set = {
         "red": 12,
-        "blue": 14,
         "green": 13,
+        "blue": 14,
     }
-    result = 0
-    for _ in games:
-        if _.is_possible(template_set):
-            # print(_)
-            result += _.game_number
+    result = sum([_.game_number
+                  for _ in [Game(_) for _ in data]
+                  if _.is_possible(template_set)])
     print(result)
 
 
 @timeit
 def star2(data):
-    games = []
-    for line in data:
-        games.append(Game(line))
-    res = 0
-    for _ in games:
-        m = _.minimum_set()
-        factors = list(m.values())
-        res += factors[0] * factors[1] * factors[2]
+    print(sum([prod(Game(_).minimum_set().values()) for _ in data]))
 
-    print(res)
-
-
-data2 = data[:]
 
 star1(data)
-star2(data2)
+star2(data)
