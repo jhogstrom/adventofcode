@@ -2,14 +2,8 @@ import logging
 import os
 
 
-levels = {
-    True: logging.DEBUG,
-    False: logging.INFO
-}
 
-
-def get_data(stardate, runtest):
-    logging.basicConfig(level=levels[runtest], format="%(message)s")
+def get_data(stardate, runtest: bool):
     if runtest:
         dataname = f"dec{stardate}_test.txt"
         logging.error("USING TESTDATA")
@@ -21,3 +15,11 @@ def get_data(stardate, runtest):
     if not data:
         raise FileNotFoundError(f"No data in {dataname}")
     return data
+
+
+def set_logging(showlog: bool):
+    levels = {
+        True: logging.DEBUG,
+        False: logging.INFO
+    }
+    logging.basicConfig(level=levels[showlog], format="%(message)s")
