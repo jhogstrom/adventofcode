@@ -61,6 +61,12 @@ class Game:
                 result[color] = max(result[color], number)
         return result
 
+    def power(self):
+        """
+        Returns the power of the game
+        """
+        return prod(self.minimum_set().values())
+
 
 @timeit
 def star1(data):
@@ -77,8 +83,7 @@ def star1(data):
 
 @timeit
 def star2(data):
-    print(sum([prod(Game(_).minimum_set().values()) for _ in data]))
-
+    print(sum([Game(_).power() for _ in data]))
 
 star1(data)
 star2(data)
