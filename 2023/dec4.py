@@ -11,10 +11,9 @@ data2 = data[:]
 
 def get_wincount(card) -> int:
     winners, numbers = card.split(":")[1].split("|")
-    winners = {int(_) for _ in winners.split()}
-    numbers = {int(_) for _ in numbers.split()}
-    count = len([_ for _ in numbers if _ in winners])
-    return count
+    winners = [_ for _ in winners.split()]
+    numbers = [_ for _ in numbers.split()]
+    return len([_ for _ in numbers if _ in winners])
 
 @timeit
 def star1(data):
@@ -34,11 +33,11 @@ def star2(data):
     cardpile = defaultdict(int)
     for i, _ in enumerate(data):
         cardpile[i] += 1
-        winstreak = get_wincount(_)
-        for j in range(i+1, i+winstreak+1):
+        wincount = get_wincount(_)
+        for j in range(i+1, i+wincount+1):
             cardpile[j] += cardpile[i]
-            logging.debug(f"\tCard {j} => {cardpile[j]}")
-        logging.debug(f"Card {i} => {winstreak} {cardpile}")
+        #     logging.debug(f"\tCard {j} => {cardpile[j]}")
+        # logging.debug(f"Card {i} => {wincount} {cardpile}")
 
     print(sum(cardpile.values()))
 
