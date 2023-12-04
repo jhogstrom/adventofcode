@@ -15,7 +15,8 @@ def copy(src, year, day):
     open(dest, "w").write(x)
 
 
-day = sys.argv[1]
+# day = "4"#sys.argv[1]
+day = input("Day: ")
 year = "2023"
 curdir = os.path.dirname(os.path.abspath(__file__))
 
