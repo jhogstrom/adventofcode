@@ -4,9 +4,10 @@ from reader import get_data, timeit, set_logging
 
 runtest = True
 stardate = "X"
+year = "YEAR"
 
 set_logging(runtest)
-data = get_data(stardate, runtest)
+data = get_data(stardate, year, runtest)
 data2 = data[:]
 
 

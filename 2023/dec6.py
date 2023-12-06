@@ -6,7 +6,7 @@ runtest = False
 stardate = "6"
 
 set_logging(runtest)
-data = get_data(stardate, runtest)
+data = get_data(stardate, "2023", runtest)
 
 
 def parsedata(data):

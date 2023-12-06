@@ -1,6 +1,12 @@
+import datetime
 import logging
-import os
 import time
+from dotenv import load_dotenv
+import requests
+import os
+import sys
+
+load_dotenv()
 
 
 def timeit(method):
@@ -18,12 +24,40 @@ def timeit(method):
     return timed
 
 
-def get_data(stardate, runtest: bool):
+def ensure_data(dataname, stardate, year: int = None):
+    """
+    Download test data from adventofcode.com if the file is not already present locally.
+
+    Args:
+        dataname (_type_): _description_
+        stardate (_type_): _description_
+    """
+
+    if year is None:
+        year = datetime.datetime.now().year
+    filename = f"{year}/{dataname}"
+
+    if not os.path.exists(filename):
+        logging.info(f"Downloading {filename}...")
+        url = f"https://adventofcode.com/{year}/day/{stardate}/input"
+        cookies = {"session": os.environ.get("AOC_SESSION")}
+        r = requests.get(url, cookies=cookies)
+        if r.status_code == 200:
+            open(filename, "w").write(r.text)
+            logging.info(f"Downloaded {filename}")
+        else:
+            logging.info(f"Unable to download {filename}")
+            logging.error(r.text)
+            sys.exit(1)
+
+
+def get_data(stardate, year, runtest: bool):
     if runtest:
         dataname = f"dec{stardate}_test.txt"
         logging.error("USING TESTDATA")
     else:
         dataname = f"dec{stardate}.txt"
+        ensure_data(dataname, stardate, year)
     curdir = os.path.dirname(os.path.abspath(__file__))
     filename = f'{curdir}\\{dataname}'
     data = [_.strip() for _ in open(filename, 'r').readlines()]

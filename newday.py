@@ -12,6 +12,7 @@ def copy(src, year, day):
     x = open(src).read()
     x = x.replace('"X"', f'"{day}"')
     x = x.replace('"XX"', f'"{day}"')
+    x = x.replace("YEAR", f'{year}')
     open(dest, "w").write(x)
 
 
@@ -21,5 +22,5 @@ year = "2023"
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 copy(f"{curdir}/templates/decXX.py", year, day)
-copy(f"{curdir}/templates/decXX.txt", year, day)
+# copy(f"{curdir}/templates/decXX.txt", year, day)
 copy(f"{curdir}/templates/decXX_test.txt", year, day)
