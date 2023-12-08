@@ -35,13 +35,7 @@ def star1(data):
     steps = 0
     while True:
         s = instructions[steps % len(instructions)]
-        # logging.debug(f"{steps:3}: {s} {p}")
-        if s == "L":
-            p = nodes[p.children[0]]
-        elif s == "R":
-            p = nodes[p.children[1]]
-        else:
-            raise ValueError
+        p = nodes[p.children[0 if s == "L" else 1]]
         steps += 1
         if p.name == "ZZZ":
             break
@@ -50,15 +44,11 @@ def star1(data):
 
 def find_period(p, nodes, instructions):
     period = 0
-    while True:
+    while not p.is_end():
         for s in instructions:
-            if s == "L":
-                p = nodes[p.children[0]]
-            else:
-                p = nodes[p.children[1]]
+            p = nodes[p.children[0 if s == "L" else 1]]
         period += 1
-        if p.is_end():
-            return period
+    return period
 
 
 @timeit
