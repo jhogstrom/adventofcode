@@ -35,7 +35,7 @@ def star1(data):
     steps = 0
     while True:
         s = instructions[steps % len(instructions)]
-        logging.debug(f"{steps:3}: {s} {p}")
+        # logging.debug(f"{steps:3}: {s} {p}")
         if s == "L":
             p = nodes[p.children[0]]
         elif s == "R":
@@ -49,28 +49,17 @@ def star1(data):
 
 
 def find_period(p, nodes, instructions):
-    steps = 0
-    is_second_end = True
-    offset = 0
     period = 0
     while True:
         for s in instructions:
             if s == "L":
                 p = nodes[p.children[0]]
-            elif s == "R":
+            else:
                 p = nodes[p.children[1]]
-            else:
-                raise ValueError
-        steps += len(instructions)
         period += 1
-        # print(period, steps, p)
         if p.is_end():
-            if not is_second_end:
-                offset = steps
-                is_second_end = True
-            else:
-                # print("Done", offset, steps)
-                return steps, offset, period
+            return period
+
 
 @timeit
 def star2(data):
@@ -79,41 +68,10 @@ def star2(data):
     nodes = [Node(_) for _ in data[2:]]
     nodes = {_.name: _ for _ in nodes}
     all_p = [_ for _ in nodes.values() if _.name[2] == "A"]
-    data = {}
-    res = []
-    for i, p in enumerate(all_p):
-        data[p] = find_period(p, nodes, instructions)
-        res.append(data[p])
+    res = [find_period(p, nodes, instructions) for p in all_p]
 
-    # pprint(data)
-    print(res)
-    offset = sum([_[1] for _ in res])
-    period = prod([_[0] / len(instructions) for _ in res])
-    print(offset, period, offset+period)
-    print(prod([_[2] for _ in res]) * len(instructions))
-    exit()
-    # logging.debug(f"{steps:3}: {p}")
-    # while True:
-    #     s = instructions[steps % len(instructions)]
-    #     new_p = []
-    #     for p in all_p:
-    #         if s == "L":
-    #             new_p.append(nodes[p.children[0]])
-    #         elif s == "R":
-    #             new_p.append(nodes[p.children[1]])
-    #         else:
-    #             raise ValueError
-    #     steps += 1
-    #     all_p = new_p
-    #     # print(steps)
-    #     # pprint(all_p)
-    #     if all([_.is_end() for _ in all_p]):
-    #         break
-    #     if steps % 1_000_000 == 0:
-    #         print(steps)
-    # print(steps)
+    print(prod(res) * len(instructions))
 
 
-
-# star1(data)
+star1(data)
 star2(data2)
