@@ -2,10 +2,10 @@ from collections import defaultdict, deque, namedtuple
 import logging
 from reader import get_data, timeit, set_logging
 
-runtest = False
+runtest = True
 stardate = "10"
 year = "2023"
-testnum = ""
+testnum = "4"
 # testnum = "4"
 if not runtest:
     testnum = ""
@@ -111,8 +111,7 @@ def star1(data):
 
 # https://www.sciencebuddies.org/science-fair-projects/references/ascii-table
 charmap = {
-    ".": " ",
-    " ": ".",
+    " ": " ",
     "L": "└",
     "7": "┐",
     "J": "┘",
@@ -121,34 +120,31 @@ charmap = {
     "|": "│",
 }
 
+BOUNDARIES = ["|", "FJ", "L7"]
+BENDS = ["F7", "LJ"]
+
 
 @timeit
 def star2(data, loop):
     logging.debug("running star 2")
     holes = []
     for y, line in enumerate(data):
-        maze = []
-        inside = False
-        walls = ""
-        for x, t in enumerate(line):
+        maze, inside, walls = [], False, ""
+        for x in range(len(line)):
             c = complex(x, y)
             tile = loop.get(c, " ")
-            if tile in "|":
-                walls = tile
-            elif tile in "FJ7L":
+            if tile in "|FJ7L":
                 walls += tile
-            if walls in ["|", "FJ", "L7"]:
-                inside = not inside
-                walls = ""
-            elif walls in ["F7", "LJ"]:
+            if walls in BOUNDARIES + BENDS:
+                if walls in BOUNDARIES:
+                    inside = not inside
                 walls = ""
 
             if inside and tile == " ":
-                holes.append([c, tile])
-            p = charmap[tile]
-            if p == "." and not inside:
-                p = " "
-            maze.append(p)
+                holes.append(c)
+                maze.append(".")
+            else:
+                maze.append(charmap[tile])
         logging.debug(("".join(maze)))
     logging.debug(holes)
     print("Star2:", len(holes))
