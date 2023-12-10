@@ -51,9 +51,9 @@ def ensure_data(dataname, stardate, year: int = None):
             sys.exit(1)
 
 
-def get_data(stardate, year, runtest: bool):
+def get_data(stardate, year, runtest: bool, testnum=""):
     if runtest:
-        dataname = f"dec{stardate}_test.txt"
+        dataname = f"dec{stardate}_test{testnum}.txt"
         logging.error("USING TESTDATA")
     else:
         dataname = f"dec{stardate}.txt"
