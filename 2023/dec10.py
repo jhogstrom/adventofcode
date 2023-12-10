@@ -1,17 +1,17 @@
-from collections import defaultdict, deque
+from collections import defaultdict, deque, namedtuple
 import logging
 from reader import get_data, timeit, set_logging
 
 runtest = False
 stardate = "10"
 year = "2023"
-testnum = "4"
+testnum = ""
+# testnum = "4"
 if not runtest:
     testnum = ""
 
 set_logging(runtest)
 data = get_data(stardate, year, runtest, testnum)
-data2 = data[:]
 
 
 def get_start(data):
@@ -35,7 +35,38 @@ WEST = -1+0j
 SOUTH = 0+1j
 EAST = 1+0j
 
-directions = [NORTH, WEST, SOUTH, EAST]
+Target = namedtuple("Target", ["tile", "comefrom"])
+Destination = namedtuple("Destination", ["move", "comefrom"])
+
+targets = {
+    Target("|", SOUTH): Destination(NORTH, SOUTH),
+    Target("|", NORTH): Destination(SOUTH, NORTH),
+    Target("7", SOUTH): Destination(WEST, EAST),
+    Target("7", WEST): Destination(SOUTH, NORTH),
+    Target("F", SOUTH): Destination(EAST, WEST),
+    Target("F", EAST): Destination(SOUTH, NORTH),
+    Target("L", NORTH): Destination(EAST, WEST),
+    Target("L", EAST): Destination(NORTH, SOUTH),
+    Target("J", NORTH): Destination(WEST, EAST),
+    Target("J", WEST): Destination(NORTH, SOUTH),
+    Target("-", EAST): Destination(WEST, EAST),
+    Target("-", WEST): Destination(EAST, WEST),
+}
+
+map_for_start = {
+    (EAST, WEST): "-",
+    (WEST, EAST): "-",
+    (NORTH, SOUTH): "|",
+    (SOUTH, NORTH): "|",
+    (NORTH, EAST): "L",
+    (EAST, NORTH): "L",
+    (NORTH, WEST): "J",
+    (WEST, NORTH): "J",
+    (SOUTH, WEST): "7",
+    (WEST, SOUTH): "7",
+    (SOUTH, EAST): "F",
+    (EAST, SOUTH): "F",
+}
 
 
 @timeit
@@ -66,64 +97,19 @@ def star1(data):
                 start_directions.add(WEST)
                 comefrom = EAST
                 p += WEST
-        elif tile == "|" and comefrom == SOUTH:
-            p += NORTH
-            comefrom = SOUTH
-        elif tile == "|" and comefrom == NORTH:
-            p += SOUTH
-            comefrom = NORTH
-        elif tile == "7" and comefrom == SOUTH:
-            p += WEST
-            comefrom = EAST
-        elif tile == "7" and comefrom == WEST:
-            p += SOUTH
-            comefrom = NORTH
-        elif tile == "F" and comefrom == SOUTH:
-            p += EAST
-            comefrom = WEST
-        elif tile == "F" and comefrom == EAST:
-            p += SOUTH
-            comefrom = NORTH
-        elif tile == "L" and comefrom == NORTH:
-            p += EAST
-            comefrom = WEST
-        elif tile == "L" and comefrom == EAST:
-            p += NORTH
-            comefrom = SOUTH
-        elif tile == "J" and comefrom == NORTH:
-            p += WEST
-            comefrom = EAST
-        elif tile == "J" and comefrom == WEST:
-            p += NORTH
-            comefrom = SOUTH
-        elif tile == "-" and comefrom == EAST:
-            p += WEST
-            comefrom = EAST
-        elif tile == "-" and comefrom == WEST:
-            p += EAST
-            comefrom = WEST
         else:
-            raise ValueError(f"Unknown tile  {tile} coming from  {comefrom}")
+            target = Target(tile, comefrom)
+            destination = targets[target]
+            p += destination.move
+            comefrom = destination.comefrom
     start_directions.add(comefrom)
-    if start_directions == {EAST, WEST}:
-        loop[start] = "-"
-    elif start_directions == {NORTH, SOUTH}:
-        loop[start] = "|"
-    elif start_directions == {NORTH, EAST}:
-        loop[start] = "L"
-    elif start_directions == {NORTH, WEST}:
-        loop[start] = "J"
-    elif start_directions == {SOUTH, WEST}:
-        loop[start] = "7"
-    elif start_directions == {SOUTH, EAST}:
-        loop[start] = "F"
-    else:
-        raise ValueError("Unknown direction")
+    loop[start] = map_for_start[tuple(start_directions)]
     print("Start1:", len(loop) // 2)
 
     return loop
 
 
+# https://www.sciencebuddies.org/science-fair-projects/references/ascii-table
 charmap = {
     ".": " ",
     " ": ".",
@@ -139,7 +125,6 @@ charmap = {
 @timeit
 def star2(data, loop):
     logging.debug("running star 2")
-    count = 0
     holes = []
     for y, line in enumerate(data):
         maze = []
@@ -159,15 +144,14 @@ def star2(data, loop):
                 walls = ""
 
             if inside and tile == " ":
-                count += 1
                 holes.append([c, tile])
             p = charmap[tile]
             if p == "." and not inside:
                 p = " "
             maze.append(p)
         logging.debug(("".join(maze)))
-    # print(holes)
-    print("Star2:", count)
+    logging.debug(holes)
+    print("Star2:", len(holes))
 
 
 loop = star1(data)
