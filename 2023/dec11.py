@@ -10,21 +10,16 @@ set_logging(runtest)
 data = get_data(stardate, year, runtest)
 
 
-def empty_row(data, y):
-    return "#" not in data[y]
-
-
-def empty_col(data, x):
-    for line in data:
-        if line[x] == "#":
-            return False
-    return True
+def has_galaxy(data, x, y):
+    if "#" in data[y]:
+        return True
+    return any((_ == "#" for _ in (line[x] for line in data)))
 
 
 def print_universe(data):
     print("    ", end="")
     for i in range(len(data[0])):
-        print(i%10, end="")
+        print(i % 10, end="")
     print()
     for y, line in enumerate(data):
         print(f"{y:3} {line}")
@@ -37,27 +32,32 @@ def calculate_distances(data, hubble):
     for y in range(len(data)):
         line = []
         for x in range(len(data[y])):
-            if empty_col(data, x) or empty_row(data, y):
-                line.append(hubble)
-            else:
+            if has_galaxy(data, x, y):
                 line.append(1)
+            else:
+                line.append(hubble)
         matrix.append(line)
-    # Find galaxies
+    # # Find galaxies
     galaxies = []
     for y in range(len(data)):
         for x in range(len(data[y])):
             if data[y][x] == "#":
                 galaxies.append((x, y))
-    # print_universe(data)
     res = 0
     # Calculate all distances
     for p in itertools.combinations(galaxies, 2):
-        x = matrix[p[0][1]][min([p[0][0], p[1][0]])+1:max([p[0][0], p[1][0]])+1]
-        y = [matrix[_][p[0][0]] for _ in range(min([p[0][1], p[1][1]])+1, max([p[0][1], p[1][1]])+1)]
+        x1 = p[0][0]
+        x2 = p[1][0]
+        y1 = p[0][1]
+        y2 = p[1][1]
+        x = matrix[y1][min([x1, x2])+1:max([x1, x2])+1]
+        y = [matrix[_][x1] for _ in range(min([y1, y2])+1, max([y1, y2])+1)]
         res += sum(x) + sum(y)
 
+    # print_universe(data)
     # print_universe(matrix)
     return res
+
 
 @timeit
 def star1(data):
