@@ -89,40 +89,25 @@ def cycle_board(matrix, data):
     tilt("east", matrix, data)
 
 
-def detect_loop(thelist):
-    slow, fast = 0, 1
-    loop1 = False
-    period = 0
-    maxfast = len(thelist) - 2
-    while fast < maxfast:
-        fast += 2
-        slow += 1
-        period += 1
-        if thelist[fast] == thelist[slow] and period > 1:
-            if not loop1:
-                period = 0
-            else:
-                return (True, slow-period, period)
-            loop1 = True
-    return (False, -1, -1)
-
 @timeit
 def star2(data):
     logging.debug("running star 2")
     matrix = define_matrix(data)
-    loads = []
+    all_grids = []
 
-    while not detect_loop(loads)[0]:
+    while True:
         cycle_board(matrix, data)
-        loads.append(board_load(matrix, data))
+        if matrix in all_grids:
+            break
+        all_grids.append(matrix.copy())
 
     MAXITER = 1_000_000_000
-    _, loop_start, period = detect_loop(loads)
-    # print(f"Loop start: {loop_start}. Period:  {period}")
-    index = MAXITER - (MAXITER//period)*period
+    period = len(all_grids) - all_grids.index(matrix)
+    loop_start = all_grids.index(matrix)
 
-    print(loads[loop_start + index])
-    print(len(loads))
+    index = (MAXITER - loop_start) % period + loop_start - 1
+    # print(f"Loop start: {loop_start}. Period:  {period}. Index {index}")
+    print(board_load(all_grids[index], data))
 
 
 star1(data)
