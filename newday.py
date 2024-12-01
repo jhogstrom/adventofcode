@@ -1,5 +1,5 @@
+import argparse
 import os
-import sys
 
 
 def copy(src, year, day):
@@ -12,13 +12,20 @@ def copy(src, year, day):
     x = open(src).read()
     x = x.replace('"X"', f'"{day}"')
     x = x.replace('"XX"', f'"{day}"')
-    x = x.replace("YEAR", f'{year}')
+    x = x.replace("YEAR", f"{year}")
     open(dest, "w").write(x)
 
 
-# day = "4"#sys.argv[1]
-day = input("Day: ")
-year = "2023"
+parser = argparse.ArgumentParser(
+    description="Copy template files for a specific day and year."
+)
+parser.add_argument("--day", required=True, help="Day of the month")
+parser.add_argument("--year", required=True, help="Year")
+
+args = parser.parse_args()
+year = args.year
+day = args.day
+
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 copy(f"{curdir}/templates/decXX.py", year, day)
