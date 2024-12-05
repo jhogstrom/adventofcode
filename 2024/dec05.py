@@ -15,11 +15,9 @@ data2 = data[:]
 
 def correctly_ordered(pageset: List[int], rules: Dict[int, List[int]]):
     for i, p in enumerate(pageset):
-        for p_before, p_after in rules.items():
-            if p_before == p:
-                for a in p_after:
-                    if a in pageset and a not in pageset[i + 1 :]:  # noqa E203
-                        return False
+        for a in rules.get(p, []):
+            if a in pageset and a not in pageset[i + 1 :]:  # noqa E203
+                return False
 
     return True
 
@@ -35,13 +33,7 @@ def get_rules(data: List[str]) -> Dict[int, List[int]]:
 
 def get_pagesets(data: List[str]) -> List[List[int]]:
     pagesets = []
-    rule_section = True
-    for s in data:
-        if not s:
-            rule_section = False
-            continue
-        if rule_section:
-            continue
+    for s in (_ for _ in data if "," in _):
         pagesets.append([int(x) for x in s.split(",")])
     return pagesets
 
@@ -62,12 +54,10 @@ def star1(data):
 def reorder(pageset: List[int], rules: Dict[int, List[int]]):
     while not correctly_ordered(pageset, rules):
         for i, p in enumerate(pageset):
-            for p_before, p_after in rules.items():
-                if p_before == p:
-                    for a in p_after:
-                        if a in pageset and a not in pageset[i + 1 :]:  # noqa E203
-                            pageset.remove(a)
-                            pageset.insert(i, a)
+            for a in rules.get(p, []):
+                if a in pageset and a not in pageset[i + 1 :]:  # noqa E203
+                    pageset.remove(a)
+                    pageset.insert(i, a)
     return pageset
 
 
