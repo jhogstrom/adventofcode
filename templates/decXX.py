@@ -1,6 +1,7 @@
-from collections import defaultdict, deque
 import logging
-from reader import get_data, timeit, set_logging
+from collections import defaultdict, deque  # noqa E401
+
+from reader import get_data, set_logging, timeit
 
 runtest = True
 stardate = "X"
