@@ -26,6 +26,8 @@ def evaluate(expected_value: int, lvalue: int, terms: list[int], ops: list[str])
         res = evaluate(expected_value, next_lvalue, terms[1:], ops)
         if res == expected_value:
             return res
+        if res > expected_value:
+            return 0
     return 0
 
 
