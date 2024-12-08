@@ -34,11 +34,11 @@ data2 = data[:]
 def evaluate(
     expected_value: int, lvalue: int, terms: list[int], allow_concat: bool = False
 ) -> bool:
+    if not terms:
+        return lvalue == expected_value
     if lvalue > expected_value:
         return False
     next_terms = terms[1:]
-    if not next_terms:
-        return lvalue == expected_value
     t0 = terms[0]
     return (
         evaluate(expected_value, lvalue + t0, next_terms, allow_concat)
