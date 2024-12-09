@@ -85,31 +85,28 @@ def create_multi_node(a1, a2, bounds):
     x2, y2 = a2
     dx = x2 - x1
     dy = y2 - y1
-    d = (dx, dy)
-    nodes = [a1, a2]
-    nodes.extend(traverse(a1, d, bounds))
-    return nodes
+    return {a1, a2}.union(traverse(a1, (dx, dy), bounds))
+
+
+def get_beacons(data):
+    beacons = defaultdict(list)
+    for y, s in enumerate(data):
+        for x, c in enumerate(s):
+            if c != ".":
+                beacons[c].append((x, y))
+    return beacons
 
 
 @timeit
 def star1(data):
     logging.debug("running star 1")
-    beacons = defaultdict(list)
+    beacons = get_beacons(data)
     bounds = ((0, 0), (len(data[0]), len(data)))
     result = set()
 
-    for y, s in enumerate(data):
-        for x, c in enumerate(s):
-            if c not in ".#":
-                beacons[c].append((x, y))
-
     for k, v in beacons.items():
         for p in combinations(v, 2):
-            res = create_node(p[0], p[1], bounds)
-            for ok, node in res:
-                if ok:
-                    # print_map(k, p, data, node)
-                    result.add(node)
+            result.update(node for ok, node in create_node(p[0], p[1], bounds) if ok)
 
     print(len(result))
 
@@ -117,19 +114,13 @@ def star1(data):
 @timeit
 def star2(data):
     logging.debug("running star 2")
-    beacons = defaultdict(list)
+    beacons = get_beacons(data)
     bounds = ((0, 0), (len(data[0]), len(data)))
     result = set()
 
-    for y, s in enumerate(data):
-        for x, c in enumerate(s):
-            if c not in ".#":
-                beacons[c].append((x, y))
-
-    for k, v in beacons.items():
+    for _, v in beacons.items():
         for p in combinations(v, 2):
-            res = create_multi_node(p[0], p[1], bounds)
-            result.update(res)
+            result.update(create_multi_node(p[0], p[1], bounds))
 
     print(len(result))
 
