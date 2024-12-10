@@ -1,5 +1,4 @@
 import logging
-from collections import defaultdict, deque  # noqa E401
 
 from reader import get_data, set_logging, timeit
 
@@ -9,7 +8,6 @@ year = "2024"
 
 set_logging(runtest)
 data = get_data(stardate, year, runtest)
-data2 = data[:]
 
 
 def get_starting_points(data):
@@ -54,7 +52,7 @@ def solve(data):
     starting_points = get_starting_points(data)
     res = []
     for p in starting_points:
-        r = get_trailheads(data, p, [p])
+        r = get_trailheads(data, p, [])
         res.extend(r)
     print("star1:", len(set(res)))
     print("star2:", len(res))
