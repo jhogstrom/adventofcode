@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import logging
 import os
@@ -72,3 +73,13 @@ def get_data(stardate, year, runtest: bool, testnum=""):
 def set_logging(showlog: bool):
     levels = {True: logging.DEBUG, False: logging.INFO}
     logging.basicConfig(level=levels[showlog], format="%(message)s")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--year", help="Year of the advent of code challenge")
+    parser.add_argument("--day", help="Day of the advent of code challenge")
+    args = parser.parse_args()
+    year = args.year
+    day = args.day
+    get_data(day, year, False)
