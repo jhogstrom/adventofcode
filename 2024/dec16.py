@@ -1,5 +1,4 @@
 import logging
-from collections import defaultdict, deque  # noqa E401
 
 from reader import get_data, set_logging, timeit
 
@@ -42,13 +41,15 @@ def new_direction(from_pos, to_pos):
     raise ValueError(f"Lost all sense of direction going from {from_pos} to {to_pos}")
 
 
-def print_maze(pos, data, seen):
+def print_maze(pos, data, seen, visited=None):
     for y, line in enumerate(data):
         for x, c in enumerate(line):
             if (x, y) == pos:
                 print("X", end="")
             elif (x, y) in seen:
-                print("o", end="")
+                print(".", end="")
+            elif visited and (x, y) in visited:
+                print(" ", end="")
             else:
                 print(c, end="")
         print()
@@ -103,7 +104,7 @@ def floodfill(data):
     costs = []
 
     while edges:
-        pos = edges.pop()
+        pos = edges.pop(0)
         cost, direction = visited[pos]
         next_pos = get_neighbors(pos, data)
         for n in next_pos:
@@ -124,9 +125,38 @@ def star1(data):
     print(floodfill(data))
 
 
+def floodfill3(data):
+    pos = get_pos(data, "S")
+    endpos = get_pos(data, "E")
+
+    visited = {}
+    edges = [(pos, "E", 0, {pos})]
+
+    while edges:
+        pos, direction, cost, path = edges.pop(0)
+        for n in get_neighbors(pos, data):
+            next_dir = new_direction(pos, n)
+            next_cost = cost + (1 if next_dir == direction else 1001)
+            next_path = path.union({n})
+            if n not in visited:
+                edges.append((n, next_dir, next_cost, next_path))
+                visited[n] = (next_dir, next_cost, next_path)
+            elif next_cost < visited[n][1]:
+                edges.append((n, next_dir, next_cost, next_path))
+                visited[n] = (next_dir, next_cost, next_path)
+            # Handle the case where next stop is in a turn, but turn cost not amortized yet.
+            elif next_cost == visited[n][1] or next_cost - 1000 == visited[n][1]:
+                combined_path = next_path.union(visited[n][2])
+                visited[n] = (next_dir, next_cost, combined_path)
+                edges.append((n, next_dir, next_cost, combined_path))
+    # print_maze(n, data, visited[endpos][2])
+    return len(visited[endpos][2])
+
+
 @timeit
 def star2(data):
     logging.debug("running star 2")
+    print(floodfill3(data))
 
 
 star1(data)
