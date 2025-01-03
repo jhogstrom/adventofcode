@@ -59,11 +59,11 @@ def star1(data):
 
 
 def get_jump_targets(n: int):
-    result = set()
+    result = {}
     for y in range(-n - 1, n + 1):
         for x in range(-(n - abs(y)) - 1, n - abs(y) + 1):
             if abs(x) + abs(y) <= n:
-                result.add((x, y))
+                result[(x, y)] = abs(x) + abs(y)
     return result
 
 
@@ -77,15 +77,14 @@ def star2(data):
     jump_length = 20
     jump_targets = get_jump_targets(jump_length)
     target_gain = 50 if runtest else 100
-    shortcuts = defaultdict(int)
+    res = 0
     for p in track:
         for _ in jump_targets:
             n = add(p, _)
-            dist = abs(_[0]) + abs(_[1])
-            if track.get(n, track[p]) >= track[p] + target_gain + dist:
-                shortcuts[track[n] - track[p] - dist] += 1
-
-    print("Count:", sum(shortcuts.values()))
+            dist = jump_targets[_]
+            if n in track and track[n] >= track[p] + target_gain + dist:
+                res += 1
+    print(res)
 
 
 star1(data)
