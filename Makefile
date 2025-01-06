@@ -1,4 +1,4 @@
-year=$(shell date +%Y)
+year?=$(shell date +%Y)
 day?=$(shell date +%d)
 
 foo:
