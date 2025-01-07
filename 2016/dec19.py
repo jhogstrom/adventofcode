@@ -12,11 +12,6 @@ data = get_data(stardate, year, runtest)
 data2 = data[:]
 
 
-@timeit
-def star1(data):
-    logging.debug("running star 1")
-
-
 class Node:
     def __init__(self, value):
         self.value = value
@@ -50,7 +45,7 @@ class Circle:
     def __repr__(self):
         return f"{self.count} - {self.current} <-> {self.opposite}"
 
-    def take_turn(self):
+    def take_turn2(self):
         self.current = self.current.next
         remove_node = self.opposite
         self.opposite = self.opposite.next
@@ -59,6 +54,13 @@ class Circle:
         remove_node.next.prev = remove_node.prev
         if self.count % 2 == 0:
             self.opposite = self.opposite.next
+
+    def take_turn(self):
+        remove_node = self.current.next
+        self.current.next = remove_node.next
+        remove_node.next.prev = self.current
+        self.current = self.current.next
+        self.count -= 1
 
     def print(self):
         node = self.current
@@ -75,6 +77,19 @@ class Circle:
 
 
 @timeit
+def star1(data):
+    logging.debug("running star 1")
+    count = 50 if runtest else int(data[0])
+    elves = Circle(count)
+    print("Setup done")
+    while elves.count > 1:
+        elves.take_turn()
+        # if elves.count % 1000 == 0:
+        #     print(elves.count, end="\r")
+    print(f"Answer: {elves.current.value}")
+
+
+@timeit
 def star2(data):
     logging.debug("running star 2")
 
@@ -82,11 +97,10 @@ def star2(data):
     elves = Circle(count)
     print("Setup done")
     while elves.count > 1:
-        elves.take_turn()
-        # elves.print()
-        if elves.count % 1000 == 0:
-            print(elves.count, end="\r")
-    print(elves.current.value)
+        elves.take_turn2()
+        # if elves.count % 1000 == 0:
+        #     print(elves.count, end="\r")
+    print(f"Answer: {elves.current.value}")
 
 
 star1(data)
