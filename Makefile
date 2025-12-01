@@ -8,7 +8,7 @@ $(year):
 	mkdir -p $@
 
 $(year)/dec$(day).py:
-	python newday.py --year=$(year) --day=$(day)
+	python helpers/newday.py --year=$(year) --day=$(day)
 # 	cp templates/decXX.py $@
 
 $(year)/dec$(day)_test.txt:

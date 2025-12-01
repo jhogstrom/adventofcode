@@ -26,7 +26,7 @@ args = parser.parse_args()
 year = args.year
 day = args.day
 
-curdir = os.path.dirname(os.path.abspath(__file__))
+curdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 copy(f"{curdir}/templates/decXX.py", year, day)
 # copy(f"{curdir}/templates/decXX.txt", year, day)
