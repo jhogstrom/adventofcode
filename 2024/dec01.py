@@ -1,6 +1,11 @@
 import logging
+import sys
+from pathlib import Path
 
-from reader import get_data, set_logging, timeit
+# Add repo root to path to enable helpers import
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from helpers.reader import get_data, set_logging, timeit  # noqa E402
 
 runtest = False
 stardate = "01"
