@@ -3,7 +3,7 @@ import os
 
 
 def copy(src, year, day):
-    dest = os.path.os.path.basename(src.replace("XX", day))
+    dest = os.path.basename(src.replace("XX", day))
     dest = f"{year}/{dest}"
 
     if os.path.exists(dest):
