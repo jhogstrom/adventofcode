@@ -1,5 +1,5 @@
 class Memory:
-    def __init__(self, code = None) -> None:
+    def __init__(self, code=None) -> None:
         self.code = code or []
 
     def get_instruction(self, addr: int) -> str:
@@ -9,29 +9,32 @@ class Memory:
         self.code[addr] = instr
 
 
-
 class Cpu:
-    def __init__(self, memory) -> None:
+    def __init__(self, memory, require_input: bool = False) -> None:
         self.pc = 0
         self.memory = memory
         self.bps = []
         self.regs = {
-            "a": 12,
+            "a": 0,
             "b": 0,
             "c": 0,
             "d": 0,
         }
+        self.require_input = require_input
 
     def add_breakpoint(self, bp):
         self.bps.append(bp)
 
     def is_breakpoint(self, line) -> str:
+        if self.pc in self.bps or line in self.bps:
+            return True
+
         ismatch = False
         if isinstance(line, str):
             p = line.split()
             ismatch = p[0] in self.bps
 
-        return self.pc in self.bps or line in self.bps or ismatch
+        return ismatch
 
     def get_operation(self, instr: str):
         if instr == "cpy":  # 2 args
@@ -96,15 +99,16 @@ class Cpu:
             target[0] = "jnz"
 
         self.memory.code[addr] = " ".join(target)
-        print(">>>", " ".join(target))
-        input("...")
+        if self.require_input:
+            print(">>>", " ".join(target))
+            input("<press enter>")
         self.pc += 1
 
     def execute_next(self):
         nextline = self.memory.get_instruction(self.pc)
         if self.is_breakpoint(nextline):
             print(f"{self.pc:<4} {nextline}  {self.regs}")
-            input("...")
+            input("<breakpoint. Press enter>")
         instr = nextline.split()
         self.get_operation(instr[0])(*instr[1:])
 
@@ -119,92 +123,110 @@ class Cpu:
 
 
 def test_program_dec12():
-    return  Memory([
-        "cpy 41 a",
-        "inc a",
-        "inc a",
-        "dec a",
-        "jnz a 2",
-        "dec a"
-    ])
+    return Memory(["cpy 41 a", "inc a", "inc a", "dec a", "jnz a 2", "dec a"])
 
 
 def program_dec12():
-    return Memory([
-        "cpy 1 a",
-        "cpy 1 b",
-        "cpy 26 d",
-        "jnz c 2",
-        "jnz 1 5",
-        "cpy 7 c",
-        "inc d",
-        "dec c",
-        "jnz c -2",
-        "cpy a c",
-        "inc a",
-        "dec b",
-        "jnz b -2",
-        "cpy c b",
-        "dec d",
-        "jnz d -6",
-        "cpy 17 c",
-        "cpy 18 d",
-        "inc a",
-        "dec d",
-        "jnz d -2",
-        "dec c",
-        "jnz c -5",
-    ])
+    return Memory(
+        [
+            "cpy 1 a",
+            "cpy 1 b",
+            "cpy 26 d",
+            "jnz c 2",
+            "jnz 1 5",
+            "cpy 7 c",
+            "inc d",
+            "dec c",
+            "jnz c -2",
+            "cpy a c",
+            "inc a",
+            "dec b",
+            "jnz b -2",
+            "cpy c b",
+            "dec d",
+            "jnz d -6",
+            "cpy 17 c",
+            "cpy 18 d",
+            "inc a",
+            "dec d",
+            "jnz d -2",
+            "dec c",
+            "jnz c -5",
+        ]
+    )
 
 
 def test_program_dec23():
-    return Memory([
-        "cpy 2 a",
-        "tgl a",
-        "tgl a",
-        "tgl a",
-        "cpy 1 a",
-        "dec a",
-        "dec a",
-    ])
+    return Memory(
+        [
+            "cpy 2 a",
+            "tgl a",
+            "tgl a",
+            "tgl a",
+            "cpy 1 a",
+            "dec a",
+            "dec a",
+        ]
+    )
 
 
 def program_dec23():
-    return Memory([
-        "cpy a b",
-        "dec b",
-        "cpy a d",
-        "cpy 0 a",
-        "cpy b c",
-        "inc a",
-        "dec c",
-        "jnz c -2",
-        "dec d",
-        "jnz d -5",
-        "dec b",
-        "cpy b c",
-        "cpy c d",
-        "dec d",
-        "inc c",
-        "jnz d -2",
-        "tgl c",
-        "cpy -16 c",
-        "jnz 1 c",
-        "cpy 75 c",
-        "jnz 85 d",
-        "inc a",
-        "inc d",
-        "jnz d -2",
-        "inc c",
-        "jnz c -5",
-    ])
+    return Memory(
+        [
+            "cpy a b",
+            "dec b",
+            "cpy a d",
+            "cpy 0 a",
+            "cpy b c",
+            "inc a",
+            "dec c",
+            "jnz c -2",
+            "dec d",
+            "jnz d -5",
+            "dec b",
+            "cpy b c",
+            "cpy c d",
+            "dec d",
+            "inc c",
+            "jnz d -2",
+            "tgl c",
+            "cpy -16 c",
+            "jnz 1 c",
+            "cpy 75 c",
+            "jnz 85 d",
+            "inc a",
+            "inc d",
+            "jnz d -2",
+            "inc c",
+            "jnz c -5",
+        ]
+    )
 
 
-memory = program_dec23()
-# memory = Memory(["tgl 1", "foo bar"])
-cpu = Cpu(memory)
-cpu.add_breakpoint(21)
-cpu.add_breakpoint(18)
-cpu.add_breakpoint("tgl c")
-cpu.run()
-print(cpu.regs)
+def star1():
+    memory = program_dec23()
+    cpu = Cpu(memory)
+    cpu.regs["a"] = 7
+    cpu.run()
+    print(cpu.regs["a"])
+
+
+def star2():
+    memory = program_dec23()
+    cpu = Cpu(memory)
+    cpu.regs["a"] = 10
+    cpu.run()
+    print(cpu.regs)
+
+
+# memory = program_dec23()
+# # memory = Memory(["tgl 1", "foo bar"])
+# cpu = Cpu(memory)
+# cpu.regs['a'] = 7
+# # cpu.add_breakpoint(21)
+# # cpu.add_breakpoint(18)
+# # cpu.add_breakpoint("tgl c")
+# cpu.run()
+# print(cpu.regs)
+star1()
+star2()
