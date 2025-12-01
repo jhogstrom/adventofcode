@@ -56,6 +56,8 @@ def floodfill(grid, bounds, pos):
         for p in get_neighbors(pos, grid, bounds):
             if p in seen:
                 continue
+            if p == bounds:
+                return cost + 1
             seen[p] = min(seen.get(p, cost + 1), cost + 1)
             edge.append((p, cost + 1))
 
