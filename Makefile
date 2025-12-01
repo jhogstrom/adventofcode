@@ -15,7 +15,7 @@ $(year)/dec$(day)_test.txt:
 	cp templates/decXX_test.txt $@
 
 $(year)/dec$(day).txt:
-	python helpers/reader.py --year=$(year) --day=$(day)
+	python 2024/reader.py --year=$(year) --day=$(day)
 
 
 today: $(year) $(year)/dec$(day).py $(year)/dec$(day)_test.txt $(year)/dec$(day).txt
