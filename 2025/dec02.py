@@ -12,22 +12,21 @@ data = get_data(stardate, year, runtest)
 data2 = data[:]
 
 
-def match_range(r, regexp: str):
+def match_range(r, pattern):
     start, end = map(int, r.split("-"))
     s = 0
     for id in range(start, end + 1):
-        if re.findall(regexp, str(id)):
+        if pattern.findall(str(id)):
             s += id
     return s
 
 
 def check_data(data, regexp: str):
+    pattern = re.compile(regexp)
     s = 0
     for line in data:
         for r in line.split(","):
-            if not r.strip():
-                continue
-            s += match_range(r, regexp)
+            s += match_range(r, pattern)
     return s
 
 
