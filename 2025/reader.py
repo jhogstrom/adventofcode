@@ -55,7 +55,7 @@ def ensure_data(dataname, stardate, year: int = None):
             sys.exit(1)
 
 
-def get_data(stardate, year, runtest: bool, testnum=""):
+def get_data(stardate, year, runtest: bool, testnum: str = "", *, dostrip: bool = True):
     if runtest:
         dataname = f"dec{stardate}_test{testnum}.txt"
         logging.error("USING TESTDATA")
@@ -64,7 +64,10 @@ def get_data(stardate, year, runtest: bool, testnum=""):
         ensure_data(dataname, stardate, year)
     curdir = os.path.dirname(os.path.abspath(__file__))
     filename = f"{curdir}\\{dataname}"
-    data = [_.strip() for _ in open(filename, "r").readlines()]
+    if dostrip:
+        data = [_.strip() for _ in open(filename, "r").readlines()]
+    else:
+        data = [_.rstrip("\n") for _ in open(filename, "r").readlines()]
     if not data:
         raise FileNotFoundError(f"No data in {dataname}")
     return data
